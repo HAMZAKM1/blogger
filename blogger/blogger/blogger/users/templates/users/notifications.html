@@ -1,0 +1,193 @@
+{% extends "users/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}🔔 Notifications - Blogger{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    background: url('https://images.unsplash.com/photo-1601597111681-8c1d57baf038?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Segoe UI', sans-serif;
+    color: #f1f1f1;
+  }
+
+  .glass-box {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    position: relative;
+  }
+
+  .notif-card {
+    background: rgba(255,255,255,0.07);
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border-left: 5px solid #00cec9;
+    transition: background 0.3s ease, transform 0.3s;
+    animation: slideIn 0.4s ease both;
+  }
+
+  .notif-card:hover {
+    background: rgba(255,255,255,0.1);
+    transform: scale(1.01);
+  }
+
+  .notif-read {
+    opacity: 0.5;
+    border-left-color: #999;
+  }
+
+  .notif-time {
+    font-size: 0.8rem;
+    color: #ccc;
+  }
+
+  .badge-new {
+    background: #0ff;
+    color: #000;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+    animation: pulse 1.5s infinite;
+  }
+
+  .filter-btns {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn-outline-info {
+    color: #0ff;
+    border-color: #0ff;
+  }
+
+  .btn-outline-info:hover {
+    background-color: #0ff;
+    color: #000;
+  }
+
+  .btn-clear {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid #f66;
+    color: #f88;
+  }
+
+  .btn-clear:hover {
+    background: #f88;
+    color: white;
+  }
+
+  #scrollTopBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 25px;
+    background: #00cec9;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 999;
+    display: none;
+    transition: 0.3s ease;
+    color: #000;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.7; }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 576px) {
+    .glass-box { padding: 20px; }
+    .notif-card { font-size: 0.9rem; }
+  }
+</style>
+
+<div class="container py-5">
+  <div class="glass-box">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="mb-0">
+        🔔 Notifications 
+        {% if notifications %}
+          <span class="badge bg-info text-dark ms-2">{{ notifications|length }}</span>
+        {% endif %}
+      </h3>
+
+      <div class="d-flex gap-2">
+        <form method="post" action="{% url 'notifications:mark_all_read' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-light btn-sm">✔️ Mark All Read</button>
+        </form>
+
+        <form method="post" action="{% url 'notifications:clear_all' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-clear btn-sm" onclick="return confirm('Are you sure you want to delete all notifications?')">🗑️ Clear All</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-btns mb-3">
+      <a href="?filter=all" class="btn btn-outline-info btn-sm {% if filter == 'all' %}active{% endif %}">All</a>
+      <a href="?filter=unread" class="btn btn-outline-info btn-sm {% if filter == 'unread' %}active{% endif %}">Unread</a>
+      <a href="?filter=read" class="btn btn-outline-info btn-sm {% if filter == 'read' %}active{% endif %}">Read</a>
+    </div>
+
+    <!-- Message -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-info">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% if notifications %}
+      {% for notif in notifications %}
+        <div class="notif-card {% if notif.is_read %}notif-read{% endif %}">
+          <div class="d-flex justify-content-between">
+            <div>
+              <strong>{{ notif.title }}</strong>
+              {% if not notif.is_read %}
+                <span class="badge-new" title="New notification">NEW</span>
+              {% endif %}
+              <p class="mb-1">{{ notif.message|linebreaksbr }}</p>
+              <small class="notif-time">{{ notif.timestamp|naturaltime }}</small>
+            </div>
+            {% if not notif.is_read %}
+              <form method="post" action="{% url 'notifications:mark_read' notif.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-info" title="Mark as Read">✓</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted text-center">📭 No notifications to show.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Scroll to Top Button -->
+<button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" id="scrollTopBtn" title="Go to top">⬆️</button>
+
+<script>
+  const scrollBtn = document.getElementById("scrollTopBtn");
+  window.onscroll = () => {
+    scrollBtn.style.display = window.scrollY > 200 ? "block" : "none";
+  };
+</script>
+{% endblock %}

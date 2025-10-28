@@ -1,0 +1,134 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ post.title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="{{ post.content|truncatewords:25 }}">
+  <meta name="author" content="{{ post.author.username }}">
+  <meta property="og:title" content="{{ post.title }}">
+  <meta property="og:description" content="{{ post.content|truncatewords:20 }}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:type" content="article">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1601597111681-8c1d57baf038?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #f1f1f1;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .overlay {
+      background-color: rgba(0, 0, 0, 0.75);
+      min-height: 100vh;
+      padding-top: 70px;
+      padding-bottom: 60px;
+    }
+    .glass-box {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      color: inherit;
+    }
+    .floating-share {
+      position: fixed;
+      top: 40%;
+      left: 10px;
+      z-index: 1000;
+    }
+    .floating-share a {
+      display: block;
+      margin: 6px 0;
+      font-size: 1.3rem;
+      background: #fff2;
+      color: #fff;
+      padding: 8px;
+      border-radius: 10px;
+      transition: background 0.3s;
+    }
+    .floating-share a:hover {
+      background: #00cec9;
+    }
+    .toc {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .toc h6 {
+      font-weight: bold;
+      margin-bottom: .5rem;
+    }
+    .toc ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .toc ul li {
+      margin: .3rem 0;
+    }
+    .toc ul li a {
+      color: #0ff;
+      text-decoration: none;
+    }
+    .toc ul li a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Floating Social Share -->
+<div class="floating-share">
+  <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" title="Share on Facebook">
+    <i class="bi bi-facebook"></i>
+  </a>
+  <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.title }}" target="_blank" title="Tweet">
+    <i class="bi bi-twitter"></i>
+  </a>
+  <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank" title="Share on LinkedIn">
+    <i class="bi bi-linkedin"></i>
+  </a>
+  <a href="mailto:?subject={{ post.title }}&body=Check out this post: {{ request.build_absolute_uri }}" title="Email">
+    <i class="bi bi-envelope"></i>
+  </a>
+</div>
+
+<!-- Main Content -->
+<div class="overlay">
+  <div class="container">
+    <div class="glass-box">
+      <h1>{{ post.title }}</h1>
+      <p class="text-muted">By <strong>{{ post.author.username }}</strong> • {{ post.created_at|naturaltime }}</p>
+
+      {% if post.content|length > 500 %}
+      <div class="toc">
+        <h6>📚 Table of Contents</h6>
+        <ul>
+          {% for line in post.content.splitlines %}
+            {% if line|length > 30 %}
+              <li><a href="#">{{ line|truncatewords:6 }}</a></li>
+            {% endif %}
+            {% if forloop.counter > 5 %} {% break %} {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <div class="content">
+        {{ post.content|linebreaks }}
+      </div>
+
+      <hr>
+      <a href="{% url 'blog:post_list' %}" class="btn btn-outline-light">⬅ Back to Posts</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

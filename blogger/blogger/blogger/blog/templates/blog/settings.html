@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<style>
+  .settings-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    border-radius: 20px;
+    color: #fff;
+    padding: 50px 30px;
+    max-width: 700px;
+    margin: auto;
+    box-shadow: 0 0 20px rgba(0,255,255,0.1);
+    animation: fadeIn 0.6s ease;
+  }
+
+  .settings-card h2 {
+    margin-bottom: 20px;
+  }
+
+  .settings-card .btn {
+    min-width: 180px;
+  }
+
+  .settings-card a {
+    text-decoration: none;
+  }
+
+  .progress {
+    height: 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 12px;
+  }
+
+  .progress-bar {
+    background-color: #0dcaf0;
+    transition: width 0.4s ease;
+  }
+
+  .action-badge {
+    font-size: 0.9rem;
+    color: #ccc;
+    margin-top: 10px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<div class="container mt-5">
+  <div class="settings-card text-center shadow-lg">
+    <h2>⚙️ Account Settings</h2>
+    <hr class="bg-light">
+
+    <p><strong>👤 Username:</strong> {{ user.username }}</p>
+    <p><strong>📧 Email:</strong> <span id="emailText">{{ user.email }}</span> <button class="btn btn-sm btn-outline-light" onclick="copyEmail()">📋 Copy</button></p>
+    <p><strong>📅 Joined:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+    <p><strong>🕓 Last Login:</strong> {{ user.last_login|date:"F d, Y, h:i A" }}</p>
+
+    {% if user.social_link %}
+    <p><strong>🔗 Social:</strong> <a href="{{ user.social_link }}" target="_blank" class="text-info">{{ user.social_link }}</a></p>
+    {% endif %}
+
+    <div class="mt-4 d-flex justify-content-center flex-wrap gap-3">
+      <a href="{% url 'edit_profile' %}" class="btn btn-outline-info px-4">✏️ Edit Profile</a>
+      <a href="{% url 'password_change' %}" class="btn btn-outline-warning px-4">🔐 Change Password</a>
+      <a href="{% url 'logout' %}" class="btn btn-outline-danger px-4">🚪 Logout</a>
+    </div>
+
+    <!-- Profile Completion -->
+    <div class="mt-5 text-start">
+      <h5>✅ Profile Completion</h5>
+      {% with filled=0 %}
+        {% if user.avatar %}{% with filled=filled|add:"25" %}{% endwith %}{% endif %}
+        {% if user.email %}{% with filled=filled|add:"25" %}{% endwith %}{% endif %}
+        {% if user.bio %}{% with filled=filled|add:"25" %}{% endwith %}{% endif %}
+        {% if user.social_link %}{% with filled=filled|add:"25" %}{% endwith %}{% endif %}
+      {% endwith %}
+      <div class="progress mt-2" role="progressbar" aria-valuenow="{{ filled }}" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" style="width: {{ filled }}%;">{{ filled }}%</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-4">
+      <h5>📎 Quick Actions</h5>
+      <div class="d-flex justify-content-center flex-wrap gap-2 mt-2">
+        <a href="#" class="btn btn-outline-light btn-sm" onclick="window.print()">🖨️ Print Settings</a>
+        <a href="mailto:{{ user.email }}" class="btn btn-outline-success btn-sm">📩 Email Yourself</a>
+      </div>
+    </div>
+
+    <!-- Security Advice -->
+    <div class="mt-4 text-warning small">
+      <strong>🔒 Tip:</strong> For best security, use a strong password and enable 2FA (if available).
+    </div>
+  </div>
+</div>
+
+<script>
+  function copyEmail() {
+    const text = document.getElementById("emailText").innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      alert("📋 Email copied to clipboard!");
+    });
+  }
+</script>
+{% endblock %}

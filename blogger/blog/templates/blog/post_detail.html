@@ -1,0 +1,295 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ post.title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="{{ post.content|truncatewords:25 }}">
+  <meta name="author" content="{{ post.author.username }}">
+  <meta property="og:title" content="{{ post.title }}">
+  <meta property="og:description" content="{{ post.content|truncatewords:20 }}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:type" content="article">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1601597111681-8c1d57baf038?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #f1f1f1;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .overlay {
+      background-color: rgba(0, 0, 0, 0.75);
+      min-height: 100vh;
+      padding-top: 70px;
+      padding-bottom: 60px;
+    }
+    .glass-box {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      color: inherit;
+    }
+    .floating-share {
+      position: fixed;
+      top: 40%;
+      left: 10px;
+      z-index: 1000;
+    }
+    .floating-share a {
+      display: block;
+      margin: 6px 0;
+      font-size: 1.3rem;
+      background: #fff2;
+      color: #fff;
+      padding: 8px;
+      border-radius: 10px;
+      transition: background 0.3s;
+    }
+    .floating-share a:hover {
+      background: #00cec9;
+    }
+    .toc {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .toc h6 {
+      font-weight: bold;
+      margin-bottom: .5rem;
+    }
+    .toc ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .toc ul li {
+      margin: .3rem 0;
+    }
+    .toc ul li a {
+      color: #0ff;
+      text-decoration: none;
+    }
+    .toc ul li a:hover {
+      text-decoration: underline;
+    }
+    .floating-share {
+    position: fixed;
+    top: 40%;
+    right: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.15);
+  }
+
+  .floating-share a,
+  .floating-share button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .floating-share a:hover,
+  .floating-share button:hover {
+    background-color: #00cec9;
+    color: #000;
+    transform: scale(1.1);
+  }
+
+  .floating-share button {
+    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    .floating-share {
+      top: auto;
+      bottom: 15px;
+      right: 10px;
+      flex-direction: row;
+      padding: 8px 12px;
+      border-radius: 30px;
+    }
+
+    .floating-share a,
+    .floating-share button {
+      width: 36px;
+      height: 36px;
+      font-size: 1rem;
+    }
+  }
+  </style>
+</head>
+<body>
+
+<div class="floating-share">
+  <!-- Facebook -->
+  <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" title="Share on Facebook">
+    <i class="bi bi-facebook"></i>
+  </a>
+
+  <!-- Twitter / X -->
+  <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.title|default:'Check this out!' }}" target="_blank" title="Tweet this">
+    <i class="bi bi-twitter-x"></i>
+  </a>
+
+  <!-- LinkedIn -->
+  <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank" title="Share on LinkedIn">
+    <i class="bi bi-linkedin"></i>
+  </a>
+
+  <!-- WhatsApp -->
+  <a href="https://api.whatsapp.com/send?text={{ post.title|default:'Check this out!' }} {{ request.build_absolute_uri }}" target="_blank" title="Share on WhatsApp">
+    <i class="bi bi-whatsapp"></i>
+  </a>
+
+  <!-- Email -->
+  <a href="mailto:?subject={{ post.title|default:'Interesting Post' }}&body=Check out this post: {{ request.build_absolute_uri }}" title="Share via Email">
+    <i class="bi bi-envelope-fill"></i>
+  </a>
+
+  <!-- Copy Link -->
+  <button onclick="copyLink()" title="Copy Link">
+    <i class="bi bi-link-45deg"></i>
+  </button>
+
+  <!-- Print Page -->
+  <button onclick="window.print()" title="Print this Page">
+    <i class="bi bi-printer"></i>
+  </button>
+</div>
+
+<!-- Main Content -->
+<div class="overlay">
+  <div class="container">
+    <div class="glass-box position-relative p-4" style="margin-top: 60px;">
+      <h1 class="mb-2">{{ post.title }}</h1>
+      <p class="text-muted">
+        By <strong>{{ post.author.username }}</strong> • 
+        {{ post.created_at|naturaltime }} • 
+        ⏱ <span id="readTime">Calculating...</span>
+      </p>
+
+      <!-- Tags -->
+      {% if post.tags.all %}
+      <div class="mb-3">
+        <strong>🏷️ Tags:</strong>
+        {% for tag in post.tags.all %}
+          <span class="badge bg-info text-dark">{{ tag.name }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Table of Contents -->
+      {% if post.content|length > 500 %}
+      <div class="toc mb-4 p-3 rounded" style="background: rgba(255,255,255,0.05);">
+        <h6 class="text-info">📚 Table of Contents</h6>
+        <ul class="list-unstyled ms-2">
+          {% for line in post.content.splitlines %}
+            {% if line|length > 30 %}
+              <li>
+                <a href="#section{{ forloop.counter }}" class="text-decoration-none text-warning">
+                  • {{ line|truncatewords:6 }}
+                </a>
+              </li>
+            {% endif %}
+            {% if forloop.counter > 8 %} {% break %} {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <!-- Post Content -->
+      <div class="content">
+        {% for line in post.content.splitlines %}
+          {% if line|length > 30 %}
+            <h5 id="section{{ forloop.counter }}" class="mt-4">{{ line|truncatewords:6 }}</h5>
+          {% endif %}
+          <p>{{ line }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Read Progress -->
+      <div class="progress mt-4" style="height: 8px;">
+        <div class="progress-bar bg-success" id="readProgress" style="width: 0%;"></div>
+      </div>
+
+      <div class="mt-4 d-flex gap-3 flex-wrap">
+        <a href="{% url 'blog:post_list' %}" class="btn btn-outline-light">⬅ Back to Posts</a>
+        <button onclick="copyPostLink()" class="btn btn-outline-info">🔗 Copy Link</button>
+        <button onclick="window.print()" class="btn btn-outline-secondary">🖨 Print</button>
+        <a href="{% url 'blog:like_post' post.pk %}" class="btn btn-outline-danger">❤️ Like ({{ post.likes.count }})</a>
+        <a href="{% url 'blog:bookmark_post' post.pk %}" class="btn btn-outline-warning">📥 Bookmark</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href)
+      .then(() => {
+        alert("✅ Link copied to clipboard!");
+      })
+      .catch(err => {
+        alert("❌ Failed to copy link.");
+      });
+  }
+    // Read time estimator
+  document.addEventListener("DOMContentLoaded", function () {
+    const text = `{{ post.content|striptags|safe }}`;
+    const words = text.split(/\s+/).length;
+    const readTime = Math.ceil(words / 200);
+    document.getElementById("readTime").textContent = readTime + " min read";
+  });
+
+  // Read progress bar
+  window.addEventListener("scroll", () => {
+    const content = document.querySelector('.glass-box');
+    const progressBar = document.getElementById("readProgress");
+    const contentHeight = content.scrollHeight - window.innerHeight;
+    const scrolled = (window.scrollY / contentHeight) * 100;
+    progressBar.style.width = `${scrolled > 100 ? 100 : scrolled}%`;
+  });
+
+  // Copy link function
+  function copyPostLink() {
+    navigator.clipboard.writeText(window.location.href)
+      .then(() => alert("✅ Link copied to clipboard"))
+      .catch(() => alert("❌ Failed to copy"));
+  }
+
+  // Smooth scroll for TOC links
+  document.querySelectorAll('.toc a').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

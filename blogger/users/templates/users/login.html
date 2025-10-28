@@ -1,0 +1,229 @@
+{% extends "users/base.html" %}
+{% load static %}
+{% block title %}Login - Blogger{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    background-size: 300% 300%;
+    animation: gradientShift 12s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    border-radius: 18px;
+    padding: 35px;
+    color: #fff;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    animation: slideFade 0.7s ease;
+    transition: transform 0.3s ease;
+  }
+
+  .glass-card:hover {
+    transform: scale(1.015);
+  }
+
+  .glass-card h2 {
+    font-weight: bold;
+    text-shadow: 1px 1px 4px #000;
+  }
+
+  .form-control, .form-check-input {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid #aaa;
+    color: #fff;
+  }
+
+  .form-control:focus {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: #00b894;
+    box-shadow: 0 0 0 0.2rem rgba(0, 184, 148, 0.3);
+  }
+
+  .btn-primary {
+    background-color: #00cec9;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: #00b6b2;
+  }
+
+  .or-divider {
+    text-align: center;
+    position: relative;
+    margin: 20px 0;
+    color: #ccc;
+  }
+
+  .or-divider::before,
+  .or-divider::after {
+    content: "";
+    position: absolute;
+    width: 45%;
+    height: 1px;
+    background: #aaa;
+    top: 50%;
+  }
+
+  .or-divider::before { left: 0; }
+  .or-divider::after { right: 0; }
+
+  .btn-google {
+    background: #fff;
+    color: #444;
+    border: 1px solid #ddd;
+  }
+
+  .btn-google:hover {
+    background: #eee;
+  }
+
+  .extra-links a {
+    color: #00cec9;
+    text-decoration: none;
+  }
+
+  .extra-links a:hover {
+    text-decoration: underline;
+  }
+
+  #password-strength {
+    height: 5px;
+    border-radius: 5px;
+    margin-top: 5px;
+  }
+
+  .strength-weak { background-color: red; width: 33%; }
+  .strength-medium { background-color: orange; width: 66%; }
+  .strength-strong { background-color: limegreen; width: 100%; }
+
+  @keyframes slideFade {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .brand-logo {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #00cec9;
+    text-align: center;
+    text-shadow: 1px 1px 8px #000;
+    animation: pulseGlow 2s infinite alternate;
+  }
+
+  @keyframes pulseGlow {
+    from { text-shadow: 0 0 5px #00cec9; }
+    to { text-shadow: 0 0 20px #00cec9; }
+  }
+
+  .clock {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #ccc;
+    margin-top: -15px;
+    margin-bottom: 10px;
+  }
+</style>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-sm-10">
+      <div class="glass-card mt-4">
+        <div class="brand-logo">📝 Blogger</div>
+        <div class="clock" id="liveClock"></div>
+        <h2 class="mb-4 text-center">🔐 Login to your account</h2>
+
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-3 position-relative">
+            <label for="id_username" class="form-label visually-hidden">Username</label>
+            <input type="text" name="username" id="id_username" class="form-control" placeholder="👤 Username" required autofocus>
+          </div>
+
+          <div class="mb-3 position-relative">
+            <label for="id_password" class="form-label visually-hidden">Password</label>
+            <div class="input-group">
+              <input type="password" name="password" id="id_password" class="form-control" placeholder="🔒 Password" required>
+              <span class="input-group-text" id="togglePassword" title="Show/Hide Password" role="button">👁️</span>
+            </div>
+            <div id="password-strength" class="mt-1"></div>
+          </div>
+
+          <div class="form-check form-switch mb-3">
+            <input type="checkbox" class="form-check-input" id="id_remember_me" name="remember_me">
+            <label class="form-check-label" for="id_remember_me">Remember me</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">🔓 Login</button>
+        </form>
+
+        <div class="or-divider">OR</div>
+
+        <a href="#" class="btn btn-google w-100 mb-3" title="Login with Google (Coming Soon)">
+          <img src="https://img.icons8.com/color/16/000000/google-logo.png"/> Sign in with Google
+        </a>
+
+        <div class="extra-links text-center mt-3">
+          Don’t have an account? <a href="{% url 'users:register' %}">Register</a><br>
+          <a href="{% url 'password_reset' %}">Forgot your password?</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Dark mode memory
+  document.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark-mode");
+      document.getElementById("darkIcon").textContent = "🌞";
+    }
+
+    const toggle = document.getElementById("togglePassword");
+    const pwd = document.getElementById("id_password");
+    const strength = document.getElementById("password-strength");
+
+    toggle.addEventListener("click", () => {
+      const type = pwd.getAttribute("type") === "password" ? "text" : "password";
+      pwd.setAttribute("type", type);
+      toggle.textContent = type === "text" ? "🙈" : "👁️";
+    });
+
+    pwd.addEventListener("input", () => {
+      const val = pwd.value;
+      if (val.length < 4) {
+        strength.className = "strength-weak";
+      } else if (val.length < 8) {
+        strength.className = "strength-medium";
+      } else {
+        strength.className = "strength-strong";
+      }
+    });
+
+    // Live clock
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById("liveClock").textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }, 1000);
+  });
+</script>
+{% endblock %}

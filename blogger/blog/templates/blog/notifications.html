@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}🔔 Notifications{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    background: url('https://images.unsplash.com/photo-1601597111681-8c1d57baf038?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+    background-size: cover;
+    color: #f1f1f1;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .glass-box {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    color: inherit;
+  }
+
+  .notif-card {
+    background: rgba(255,255,255,0.07);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border-left: 5px solid #00cec9;
+    transition: background 0.3s;
+  }
+
+  .notif-card:hover {
+    background: rgba(255,255,255,0.1);
+  }
+
+  .notif-read {
+    opacity: 0.5;
+    border-left-color: #999;
+  }
+
+  .notif-time {
+    font-size: 0.8rem;
+    color: #ccc;
+  }
+
+  .btn-outline-info {
+    color: #0ff;
+    border-color: #0ff;
+  }
+
+  .btn-outline-info:hover {
+    background-color: #0ff;
+    color: #000;
+  }
+
+  #scrollTopBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 25px;
+    background: #00cec9;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 999;
+    display: none;
+    transition: 0.3s ease;
+    color: #000;
+  }
+
+  @media (max-width: 576px) {
+    .glass-box {
+      padding: 20px;
+    }
+    .notif-card {
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<div class="container py-5">
+  <div class="glass-box">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="mb-0">🔔 Notifications</h3>
+      <form method="post" action="{% url 'notifications:mark_all_read' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-light btn-sm">✔️ Mark All as Read</button>
+      </form>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-info">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% if notifications %}
+      {% for notif in notifications %}
+        <div class="notif-card {% if notif.is_read %}notif-read{% endif %}">
+          <div class="d-flex justify-content-between">
+            <div>
+              <strong>{{ notif.title }}</strong>
+              <p class="mb-1">{{ notif.message|linebreaksbr }}</p>
+              <small class="notif-time">{{ notif.timestamp|naturaltime }}</small>
+            </div>
+            {% if not notif.is_read %}
+              <form method="post" action="{% url 'notifications:mark_read' notif.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-info" title="Mark as Read">✓</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted">No notifications yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Scroll to Top -->
+<button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" id="scrollTopBtn" title="Go to top">⬆️</button>
+
+<script>
+  // Scroll to Top logic
+  const scrollBtn = document.getElementById("scrollTopBtn");
+  window.onscroll = () => {
+    scrollBtn.style.display = window.scrollY > 200 ? "block" : "none";
+  };
+</script>
+{% endblock %}

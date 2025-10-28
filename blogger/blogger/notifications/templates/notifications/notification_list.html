@@ -1,0 +1,99 @@
+{% extends 'blog/base.html' %}
+{% load static humanize %}
+
+{% block title %}🔔 Notifications{% endblock %}
+
+{% block content %}
+<video autoplay muted loop id="bgVideo" class="fullscreen-bg">
+  <source src="{% static 'videos/bg.mp4' %}" type="video/mp4">
+</video>
+
+<div class="glass-container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="heading">🔔 Your Notifications</h2>
+    <form method="post" action="{% url 'notifications:mark_all_read' %}">
+      {% csrf_token %}
+      <button class="btn btn-sm btn-success">✅ Mark All as Read</button>
+    </form>
+  </div>
+
+  {% if notifications %}
+    {% for notification in notifications %}
+      <div class="notify-box {% if not notification.is_read %}unread{% endif %}">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h5 class="text-info">{{ notification.title }}</h5>
+            <p class="text-light mb-1">{{ notification.message }}</p>
+            <small class="text-muted">{{ notification.timestamp|naturaltime }}</small>
+          </div>
+          <div class="text-end">
+            {% if not notification.is_read %}
+              <a href="{% url 'notifications:mark_read' notification.pk %}" class="btn btn-sm btn-outline-primary">📩 Mark as Read</a>
+            {% endif %}
+            <a href="{% url 'notifications:delete' notification.pk %}" class="btn btn-sm btn-outline-danger">🗑 Delete</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="alert alert-info">You have no notifications!</div>
+  {% endif %}
+</div>
+
+<button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="scroll-top">⬆</button>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.fullscreen-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  filter: brightness(0.3);
+}
+.glass-container {
+  max-width: 800px;
+  margin: 80px auto;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 0 24px rgba(0,255,255,0.3);
+  color: #fff;
+}
+.heading {
+  font-size: 2rem;
+  color: #0ff;
+}
+.notify-box {
+  background: rgba(255, 255, 255, 0.08);
+  border-left: 4px solid #00bcd4;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 8px rgba(0,255,255,0.1);
+}
+.unread {
+  border-left-color: #ff6b6b;
+  background: rgba(255, 255, 255, 0.15);
+}
+.scroll-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #0ff;
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  padding: 0.6rem 1rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 0 12px #0ff;
+}
+.scroll-top:hover {
+  background: #00bcd4;
+}
+</style>
+{% endblock %}

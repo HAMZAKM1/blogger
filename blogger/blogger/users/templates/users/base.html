@@ -1,0 +1,349 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}User Area | Blogger{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <style>
+    :root {
+      --accent: #00f2ff;
+    }
+
+    body {
+      background: url('https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      opacity: 0;
+    }
+
+    body.loaded {
+      opacity: 1;
+    }
+
+    .overlay {
+      background-color: rgba(0, 0, 0, 0.75);
+      min-height: 100vh;
+      padding: 60px 15px;
+      color: white;
+      position: relative;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      box-shadow: 0 0 16px rgba(0, 255, 255, 0.25);
+      color: white;
+    }
+
+    .dark-mode body {
+      background-color: #121212 !important;
+      color: #eee;
+    }
+
+    .dark-toggle {
+      cursor: pointer;
+      color: #fff;
+      background: none;
+      font-size: 1.4rem;
+      border: none;
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      z-index: 999;
+    }
+
+    #liveClock {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      font-size: 0.95rem;
+      color: #0ff;
+    }
+
+    #scrollTopBtn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 999;
+      border: none;
+      border-radius: 50%;
+      padding: 12px 16px;
+      font-size: 1.5rem;
+      background-color: var(--accent);
+      color: white;
+      display: none;
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .motivator {
+      font-size: 1.1rem;
+      margin-top: 10px;
+      text-align: center;
+      color: #8ae3ff;
+      animation: fadeInUp 1s ease;
+      font-style: italic;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    #sideNav {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 250px;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      color: white;
+      padding: 2rem 1rem;
+      transition: 0.3s ease;
+      z-index: 1050;
+      box-shadow: 4px 0 15px rgba(0,255,255,0.2);
+    }
+
+    #sideNav a {
+      color: #0ff;
+      display: block;
+      padding: 8px 0;
+      text-decoration: none;
+    }
+
+    #sideNav a:hover {
+      color: #fff;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 85px;
+      right: 30px;
+      background-color: var(--accent);
+      color: #000;
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      font-size: 1.8rem;
+      box-shadow: 0 0 12px var(--accent);
+      border: none;
+      z-index: 999;
+    }
+
+    .glass-sidebar {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(14px);
+      color: #fff;
+      max-width: 260px;
+      border-radius: 16px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .glass-header {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hover-glow:hover {
+      color: #00ffff;
+      text-shadow: 0 0 6px #00ffff;
+    }
+
+    .text-gradient {
+      background: linear-gradient(to right, #00ffff, #00b894);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .btn-glow:hover {
+      box-shadow: 0 0 10px #00b894aa;
+      text-shadow: 0 0 6px #00ffff;
+    }
+
+    .waterglass-box {
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, #00f2ff, #00b894) 1;
+      border-radius: 18px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.25);
+      color: #e6ffff;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .waterglass-box:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 24px rgba(0, 255, 255, 0.4);
+    }
+
+    .glow-title {
+      font-weight: bold;
+      font-size: 1.6rem;
+      background: linear-gradient(to right, #00f2ff, #00b894);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 6px rgba(0, 255, 255, 0.5);
+    }
+
+    .bg-gradient {
+      background: linear-gradient(to right, #00f2ff, #00b894);
+    }
+  </style>
+</head>
+<body>
+<div class="overlay glass-header px-4 py-3 rounded-bottom-4 shadow-lg">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+      <span id="liveClock" class="text-light fs-5">🕒 00:00</span>
+      <button class="dark-toggle btn btn-outline-light btn-sm" onclick="toggleDarkMode()" title="Toggle dark mode">
+        <span id="darkIcon">🌗</span>
+      </button>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <h5 id="greetingMessage" class="text-gradient m-0">👋 Welcome back!</h5>
+      <button class="btn btn-glow btn-outline-info position-relative" onclick="alert('Coming soon: Notifications')">
+        🔔<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notifCount">3</span>
+      </button>
+      <button class="btn btn-outline-light" onclick="toggleSidebar()">📂 Menu</button>
+    </div>
+  </div>
+</div>
+
+<div class="container animate__animated animate__fadeInDown">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% block content %}
+  {% if user.is_authenticated %}
+    <div class="waterglass-box my-4 p-4 rounded-4 shadow-lg">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="glow-title m-0">📢 Blogger Highlights</h4>
+        <span class="badge bg-gradient fw-semibold text-dark">LIVE</span>
+      </div>
+      <p class="text-light">Explore the latest features and stay updated with what's new:</p>
+      <ul class="list-unstyled ps-3 mb-0">
+        <li>📝 <strong>Post with Style:</strong> Create stunning content with markdown support.</li>
+        <li>🎨 <strong>Custom Themes:</strong> Pick your accent color and go dark or light!</li>
+        <li>🔔 <strong>Smart Alerts:</strong> Stay informed with real-time notifications.</li>
+        <li>🚀 <strong>Performance Boost:</strong> Faster, smoother, more responsive.</li>
+      </ul>
+    </div>
+  {% endif %}
+  {% endblock %}
+
+  <p class="motivator" id="motivatorText">✨ Stay focused, stay inspired!</p>
+</div>
+
+{% if user.is_authenticated %}<a href="{% url 'blog:post_create' %}" class="fab-btn" title="New Post">✍️</a>{% endif %}
+
+<div id="sideNav" class="glass-sidebar p-4 rounded-4 shadow-lg">
+  <h5 class="text-info fw-bold mb-4 border-bottom pb-2">📚 Quick Menu</h5>
+  <ul class="list-unstyled fs-5">
+    <li class="mb-3"><a href="{% url 'users:profile' %}" class="nav-link text-light hover-glow">👤 Profile</a></li>
+    <li class="mb-3"><a href="{% url 'notifications:list' %}" class="nav-link text-light hover-glow">🔔 Notifications</a></li>
+    <li class="mb-3"><a href="{% url 'users:logout' %}" class="nav-link text-danger hover-glow">🚪 Logout</a></li>
+  </ul>
+</div>
+
+<button id="scrollTopBtn" title="Scroll to top">⬆️</button>
+<footer class="mt-5 text-center">
+  © 2025 Blogger | Made with ❤️ by Hamza | <a href="mailto:support@blogger.com" class="text-info text-decoration-none">💬 Contact</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function toggleDarkMode() {
+    const icon = document.getElementById('darkIcon');
+    const isDark = document.body.classList.toggle('dark-mode');
+    icon.textContent = isDark ? '🌞' : '🌗';
+    localStorage.setItem('darkMode', isDark);
+  }
+
+  setInterval(() => {
+    const now = new Date();
+    document.getElementById('liveClock').textContent = '🕒 ' + now.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+  }, 1000);
+
+  const scrollBtn = document.getElementById('scrollTopBtn');
+  window.onscroll = () => {
+    scrollBtn.style.display = window.scrollY > 200 ? 'block' : 'none';
+  };
+  scrollBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.classList.add('loaded');
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark-mode');
+      document.getElementById('darkIcon').textContent = '🌞';
+    }
+
+    const username = "{{ user.username|default:'User' }}";
+    const greetings = [
+      "👋 Welcome back, storyteller!",
+      "🌈 Your creativity is the spark of today.",
+      "📝 Ready to blog something brilliant?",
+      "🚀 Let’s inspire the world!",
+      "💬 Speak. Share. Shine."
+    ];
+    document.getElementById('greetingMessage').textContent = greetings[Math.floor(Math.random() * greetings.length)].replace('!', `, ${username}!`);
+
+    document.getElementById('notifCount').textContent = Math.floor(Math.random() * 4 + 1);
+  });
+
+  function toggleSidebar() {
+    const side = document.getElementById('sideNav');
+    side.style.left = side.style.left === '0px' ? '-260px' : '0px';
+  }
+
+  const motivator = document.getElementById('motivatorText');
+  const texts = [
+    "🖊️ Write with passion.",
+    "💬 Let your voice be heard.",
+    "🔥 Your words matter.",
+    "🚀 Create your legacy."
+  ];
+  let index = 0, char = 0, deleting = false;
+  function typeEffect() {
+    if (!motivator) return;
+    if (!deleting && char <= texts[index].length) {
+      motivator.textContent = texts[index].substring(0, char++);
+    } else if (deleting && char >= 0) {
+      motivator.textContent = texts[index].substring(0, char--);
+    } else {
+      deleting = !deleting;
+      if (!deleting) index = (index + 1) % texts.length;
+    }
+    setTimeout(typeEffect, deleting ? 50 : 120);
+  }
+  typeEffect();
+
+  const themePicker = document.createElement('input');
+  themePicker.type = 'color';
+  themePicker.id = 'themePicker';
+  themePicker.title = 'Pick accent color';
+  themePicker.style.position = 'fixed';
+  themePicker.style.bottom = '30px';
+  themePicker.style.left = '30px';
+  themePicker.style.zIndex = '999';
+  themePicker.value = localStorage.getItem('accent') || '#00f2ff';
+  document.body.appendChild(themePicker);
+
+  document.documentElement.style.setProperty('--accent', themePicker.value);
+  themePicker.addEventListener('input', e => {
+    document.documentElement.style.setProperty('--accent', e.target.value);
+    localStorage.setItem('accent', e.target.value);
+  });
+</script>
+</body>
+</html>

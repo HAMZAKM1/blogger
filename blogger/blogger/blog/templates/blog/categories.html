@@ -1,0 +1,117 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<video autoplay muted loop id="bg-video">
+  <source src="{% static 'videos/background.mp4' %}" type="video/mp4">
+</video>
+
+<div class="category-container">
+  <h1 class="page-title">🗂 Blog Categories</h1>
+
+  {% if categories %}
+    <div class="category-grid">
+      {% for category in categories %}
+        <div class="category-card">
+          <h2>{{ category.name }}</h2>
+          <p>{{ category.description|default:"No description available." }}</p>
+          <a href="{% url 'category_posts' category.slug %}" class="view-btn">View Posts</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="no-categories">No categories found.</p>
+  {% endif %}
+</div>
+
+<style>
+/* ===== Background Video ===== */
+#bg-video {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  z-index: -1;
+  filter: brightness(0.4);
+}
+
+/* ===== Container ===== */
+.category-container {
+  padding: 80px 40px;
+  color: #fff;
+  text-align: center;
+  backdrop-filter: blur(5px);
+}
+
+/* ===== Title ===== */
+.page-title {
+  font-size: 2.8rem;
+  margin-bottom: 40px;
+  color: #7ef9ff;
+  text-shadow: 0 0 15px #00d4ff;
+}
+
+/* ===== Category Cards ===== */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  justify-items: center;
+}
+
+.category-card {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+  padding: 30px;
+  width: 280px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 0 40px rgba(0, 255, 255, 0.4);
+}
+
+.category-card h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #00eaff;
+}
+
+.category-card p {
+  font-size: 1rem;
+  color: #e0e0e0;
+  min-height: 60px;
+}
+
+/* ===== Button ===== */
+.view-btn {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 25px;
+  background: linear-gradient(45deg, #00eaff, #0077ff);
+  border-radius: 25px;
+  color: #fff;
+  font-weight: bold;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.view-btn:hover {
+  background: linear-gradient(45deg, #0077ff, #00eaff);
+  box-shadow: 0 0 15px #00eaff;
+}
+
+/* ===== No categories ===== */
+.no-categories {
+  color: #ccc;
+  font-size: 1.2rem;
+  margin-top: 20px;
+}
+</style>
+{% endblock %}

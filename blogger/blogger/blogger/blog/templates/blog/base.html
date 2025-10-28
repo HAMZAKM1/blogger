@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}My Blog{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {% load static %}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  <style>
+    body {
+      margin: 0;
+      background: url('https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+    }
+
+    .navbar {
+      backdrop-filter: blur(12px);
+      background-color: rgba(0, 0, 0, 0.6);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .navbar-brand,
+    .nav-link {
+      color: #0ff !important;
+      transition: color 0.3s ease;
+    }
+
+    .navbar-brand:hover,
+    .nav-link:hover {
+      color: #fff !important;
+    }
+
+    .container {
+      margin-top: 80px;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    }
+
+    .alert {
+      backdrop-filter: blur(10px);
+      background-color: rgba(0, 123, 255, 0.2);
+      border: none;
+      color: #fff;
+    }
+
+    footer {
+      margin-top: 80px;
+      padding: 20px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.5);
+      color: #aaa;
+      font-size: 0.9rem;
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-glass {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    .btn-glass:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+      color: #000;
+    }
+    .navbar .nav-link {
+  position: relative;
+  padding: 0.5rem 1rem;
+  transition: color 0.3s ease;
+}
+
+.navbar .nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 0;
+  height: 2px;
+  background-color: #00cec9;
+  transition: width 0.3s ease;
+}
+
+.navbar .nav-link:hover::after {
+  width: 80%;
+}
+
+.navbar .nav-link:hover {
+  color: #00f2ff !important;
+}
+.neon-glass-nav {
+  backdrop-filter: blur(14px);
+  background: rgba(0, 0, 0, 0.45);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1050;
+}
+
+.glow-text {
+  background: linear-gradient(to right, #00fff7, #00e0ff, #00fff7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.glow-text:hover {
+  text-shadow: 0 0 12px rgba(0, 255, 255, 0.6), 0 0 18px rgba(0, 255, 255, 0.5);
+}
+
+.nav-glow {
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.nav-glow:hover {
+  color: #0ff !important;
+  text-shadow: 0 0 10px #0ff, 0 0 15px #0ff;
+}
+.glass-box {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+}
+
+.glass-message {
+  background: rgba(0, 0, 0, 0.55);
+  color: #e0f7fa;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+  </style>
+</head>
+
+<body>
+ <!-- 🌌 Enhanced Glassmorphic Navigation -->
+<nav class="navbar navbar-expand-lg fixed-top shadow-sm neon-glass-nav">
+  <div class="container-fluid">
+    <a class="navbar-brand glow-text fw-bold fs-4" href="{% url 'blog:post_list' %}">
+      🌌 MyBlog
+    </a>
+    <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link nav-glow text-white" href="{% url 'users:profile' %}">👤 {{ user.username }}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-glow text-white" href="{% url 'blog:post_create' %}">➕ New Post</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-glow text-white" href="{% url 'users:logout' %}">🚪 Logout</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link nav-glow text-white" href="{% url 'users:login' %}">🔐 Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-glow text-white" href="{% url 'users:register' %}">🆕 Register</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+
+  <!-- 📦 Waterglass Content Wrapper -->
+<div class="container mt-4">
+
+  <!-- 💬 Flash Messages -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} shadow-lg glass-message animate__animated animate__fadeInDown mt-2" role="alert" style="border-left: 6px solid #0ff;">
+        {{ message }}
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- ✨ Glass Panel Block -->
+  <div class="glass-box p-4 rounded-4 shadow-lg mt-4 text-light" style="background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+    {% block content %}
+      <!-- 📥 Default content area (override in child templates) -->
+      <div class="text-center py-5">
+        <h4 class="text-info">🚧 Content Loading...</h4>
+        <p class="text-muted">This area will show page-specific content.</p>
+      </div>
+    {% endblock %}
+  </div>
+
+</div>
+
+
+  <!-- ⚓ Footer -->
+  <footer>
+    &copy; {{ year|default:2025 }} My Blog · Built with 🧠 Django and 💖 creativity.
+  </footer>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

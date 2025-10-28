@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}My Blog{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {% load static %}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  <style>
+    body {
+      margin: 0;
+      background: url('https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+    }
+
+    .navbar {
+      backdrop-filter: blur(12px);
+      background-color: rgba(0, 0, 0, 0.6);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .navbar-brand,
+    .nav-link {
+      color: #0ff !important;
+      transition: color 0.3s ease;
+    }
+
+    .navbar-brand:hover,
+    .nav-link:hover {
+      color: #fff !important;
+    }
+
+    .container {
+      margin-top: 80px;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    }
+
+    .alert {
+      backdrop-filter: blur(10px);
+      background-color: rgba(0, 123, 255, 0.2);
+      border: none;
+      color: #fff;
+    }
+
+    footer {
+      margin-top: 80px;
+      padding: 20px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.5);
+      color: #aaa;
+      font-size: 0.9rem;
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-glass {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    .btn-glass:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+      color: #000;
+    }
+    .navbar .nav-link {
+  position: relative;
+  padding: 0.5rem 1rem;
+  transition: color 0.3s ease;
+}
+
+.navbar .nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 0;
+  height: 2px;
+  background-color: #00cec9;
+  transition: width 0.3s ease;
+}
+
+.navbar .nav-link:hover::after {
+  width: 80%;
+}
+
+.navbar .nav-link:hover {
+  color: #00f2ff !important;
+}
+.neon-glass-nav {
+  backdrop-filter: blur(14px);
+  background: rgba(0, 0, 0, 0.45);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1050;
+}
+
+.glow-text {
+  background: linear-gradient(to right, #00fff7, #00e0ff, #00fff7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.glow-text:hover {
+  text-shadow: 0 0 12px rgba(0, 255, 255, 0.6), 0 0 18px rgba(0, 255, 255, 0.5);
+}
+
+.nav-glow {
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.nav-glow:hover {
+  color: #0ff !important;
+  text-shadow: 0 0 10px #0ff, 0 0 15px #0ff;
+}
+.glass-box {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+}
+
+.glass-message {
+  background: rgba(0, 0, 0, 0.55);
+  color: #e0f7fa;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Neon Glow Text */
+.glow-text {
+  color: #0ff;
+  text-shadow: 0 0 8px #0ff, 0 0 15px #0ff;
+}
+
+/* Glassmorphism Navbar */
+.neon-glass-nav {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Neon Link Glow */
+.nav-glow {
+  transition: all 0.3s;
+  position: relative;
+}
+.nav-glow:hover {
+  color: #00ffff;
+  text-shadow: 0 0 8px #00ffff;
+}
+.nav-glow::after {
+  content: '';
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  left: 0;
+  bottom: 0;
+  background: cyan;
+  transition: 0.3s;
+}
+.nav-glow:hover::after {
+  width: 100%;
+}
+
+/* Dropdown Styling */
+.glass-dropdown {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+}
+
+/* Glass Input Field */
+.glass-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid #0ff;
+  backdrop-filter: blur(6px);
+}
+
+/* Avatar */
+.navbar .rounded-circle {
+  border: 2px solid #0ff;
+}
+
+/* Dark Mode Toggle (optional functionality below) */
+</style>
+
+</head>
+
+<body>
+ <!-- 🌌 Enhanced Glassmorphic Navigation -->
+<nav class="navbar navbar-expand-lg fixed-top shadow-lg neon-glass-nav px-3">
+  <div class="container-fluid">
+    <a class="navbar-brand glow-text fw-bold fs-4" href="{% url 'blog:post_list' %}">
+      🌌 MyBlog
+    </a>
+
+    <!-- Toggle Button for Mobile -->
+    <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar Links -->
+    <div class="collapse navbar-collapse" id="navbar">
+      <!-- 🔍 Search Bar -->
+      <form class="d-flex me-auto" method="GET" action="{% url 'blog:search' %}">
+        <input class="form-control me-2 glass-input text-white" type="search" name="q" placeholder="Search posts..." aria-label="Search">
+        <button class="btn btn-outline-light" type="submit">🔍</button>
+      </form>
+
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+
+        <!-- 🌐 Category Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white nav-glow" href="#" role="button" data-bs-toggle="dropdown">
+            📰 Categories
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark glass-dropdown">
+            <li><a class="dropdown-item" href="#">Technology</a></li>
+            <li><a class="dropdown-item" href="#">Lifestyle</a></li>
+            <li><a class="dropdown-item" href="#">Travel</a></li>
+            <li><a class="dropdown-item" href="#">Health</a></li>
+          </ul>
+        </li>
+
+        <!-- 🔔 Notifications -->
+        <li class="nav-item">
+          <a class="nav-link nav-glow text-white" href="#">
+            🔔
+          </a>
+        </li>
+
+        {% if user.is_authenticated %}
+          <!-- 👤 User Avatar & Name -->
+          <li class="nav-item">
+            <a class="nav-link nav-glow text-white d-flex align-items-center" href="{% url 'users:profile' %}">
+              <img src="{{ user.profile.image.url }}" class="rounded-circle me-1" style="width: 30px; height: 30px; object-fit: cover;" alt="avatar">
+              {{ user.username }}
+            </a>
+          </li>
+
+          <!-- ➕ New Post -->
+          <li class="nav-item">
+            <a class="nav-link nav-glow text-white" href="{% url 'blog:post_create' %}">➕ New Post</a>
+          </li>
+
+          <!-- 🚪 Logout -->
+          <li class="nav-item">
+            <a class="nav-link nav-glow text-white" href="{% url 'users:logout' %}">🚪 Logout</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link nav-glow text-white" href="{% url 'users:login' %}">🔐 Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-glow text-white" href="{% url 'users:register' %}">🆕 Register</a>
+          </li>
+        {% endif %}
+
+        <!-- 🌙 Dark Mode Toggle -->
+        <li class="nav-item ms-3">
+          <button id="darkModeToggle" class="btn btn-outline-light rounded-circle" title="Toggle Dark Mode">🌓</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+  <!-- 📦 Waterglass Content Wrapper -->
+<div class="container mt-4">
+
+  <!-- 💬 Flash Messages -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} shadow-lg glass-message animate__animated animate__fadeInDown d-flex align-items-center justify-content-between mt-3 px-4 py-3"
+           role="alert"
+           style="background: rgba(0, 255, 255, 0.1); border-left: 5px solid #0ff; backdrop-filter: blur(12px); border-radius: 12px; color: #fff;">
+        <div><i class="bi bi-info-circle me-2"></i> {{ message }}</div>
+        <button type="button" class="btn-close btn-close-white ms-3" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- ✨ Glass Panel Block -->
+  <div class="glass-box p-4 rounded-4 shadow-lg mt-4 text-light"
+       style="background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); transition: 0.3s;">
+    {% block content %}
+      <!-- 📥 Default content area (override in child templates) -->
+      <div class="text-center py-5">
+        <h4 class="text-info">🚧 Content Loading...</h4>
+        <p class="text-muted">This area will show page-specific content.</p>
+      </div>
+    {% endblock %}
+  </div>
+</div>
+
+<!-- ⚓ Footer -->
+<footer class="mt-5 text-light py-4 px-3 text-center position-relative"
+        style="background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); font-size: 0.95rem; border-top: 1px solid rgba(255,255,255,0.08);">
+
+  <div class="mb-2">
+    &copy; {{ year|default:2025 }} <strong>My Blog</strong> · Built with 🧠 Django and 💖 creativity
+  </div>
+
+  <div class="mb-2 text-muted">
+    Visitor Time: <span id="localTime"></span> | <a href="#" class="text-info text-decoration-none" onclick="window.scrollTo(0,0)">Scroll to Top</a>
+  </div>
+
+  <div class="social-icons mt-3">
+    <a href="https://github.com/" target="_blank" class="me-2 text-white"><i class="bi bi-github"></i></a>
+    <a href="https://linkedin.com/" target="_blank" class="me-2 text-white"><i class="bi bi-linkedin"></i></a>
+    <a href="mailto:contact@example.com" class="text-white"><i class="bi bi-envelope"></i></a>
+  </div>
+
+  <!-- Floating Help Button -->
+  <button class="btn btn-info position-fixed bottom-0 end-0 m-4 rounded-circle shadow" style="z-index: 999;" onclick="alert('Need Help? Contact support@example.com')">
+    <i class="bi bi-question-circle-fill"></i>
+  </button>
+</footer>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  const toggle = document.getElementById('darkModeToggle');
+  toggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+  });
+    // Show current time
+  function updateTime() {
+    const now = new Date();
+    document.getElementById('localTime').textContent = now.toLocaleTimeString();
+  }
+  updateTime();
+  setInterval(updateTime, 1000);
+
+  // Auto close flash messages after 6 seconds
+  setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(alert => alert.remove());
+  }, 6000);
+</script>
+
+</body>
+</html>

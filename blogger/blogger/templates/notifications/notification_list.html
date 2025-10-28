@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load notification_extras %}
+{% load humanize %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="text-info mb-4">🔔 Notifications</h2>
+
+  <form method="post" action="{% url 'notifications:mark_all_read' %}" class="mb-3">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success btn-sm shadow-sm">✅ Mark All as Read</button>
+  </form>
+
+  <ul class="list-unstyled">
+    {% for notif in notifications %}
+      <li class="glass-box mb-4 p-3 shadow-lg position-relative" style="border-left: 4px solid {% if notif.is_read %}#888{% else %}#00ffe1{% endif %}; opacity: {{ notif.is_read|opacity }};">
+        <h5 class="text-warning mb-1">{{ notif.title }}</h5>
+        <p class="text-light mb-2">{{ notif.message }}</p>
+        <small class="text-muted">🕒 {{ notif.timestamp|naturaltime }}</small>
+
+        {% if not notif.is_read %}
+          <form method="post" action="{% url 'notifications:mark_read' notif.pk %}" class="mt-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-info btn-glow">Mark as Read</button>
+          </form>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li class="glass-box p-4 text-center text-secondary">😴 No new notifications.</li>
+    {% endfor %}
+  </ul>
+</div>
+
+<style>
+  .glass-box {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+    color: #f1f1f1;
+  }
+
+  .glass-box:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
+  }
+
+  .btn-glow:hover {
+    box-shadow: 0 0 10px #00b894aa;
+    text-shadow: 0 0 6px #00ffff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .glass-box {
+      background: rgba(0, 0, 0, 0.4);
+      color: #ddd;
+    }
+  }
+</style>
+{% endblock %}

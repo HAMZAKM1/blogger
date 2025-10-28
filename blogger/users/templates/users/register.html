@@ -1,0 +1,239 @@
+{% extends "users/base.html" %}
+{% load static %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+    background-size: cover;
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 30px;
+    color: #fff;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  .glass-card h2 {
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  label {
+    color: #ddd;
+    font-weight: 500;
+  }
+
+  .form-control {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #fff;
+  }
+
+  .form-control::placeholder {
+    color: #ccc;
+  }
+
+  .form-control:focus {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+    box-shadow: none;
+  }
+
+  .btn-primary {
+    background-color: #0984e3;
+    border: none;
+    font-weight: bold;
+  }
+
+  .btn-primary:hover {
+    background-color: #74b9ff;
+  }
+
+  .alert-danger {
+    background-color: rgba(255, 0, 0, 0.1);
+    color: #ff7675;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem;
+  }
+
+  .or-divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+    color: #ccc;
+  }
+
+  .or-divider::before,
+  .or-divider::after {
+    content: "";
+    position: absolute;
+    width: 45%;
+    height: 1px;
+    background: #aaa;
+    top: 50%;
+  }
+
+  .or-divider::before { left: 0; }
+  .or-divider::after { right: 0; }
+
+  #strengthMessage {
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+  }
+
+  .strength-weak { color: #ff7675; }
+  .strength-medium { color: #fdcb6e; }
+  .strength-strong { color: #00b894; }
+
+  .form-check-label {
+    color: #ccc;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<!-- Toast for messages -->
+{% if messages %}
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    {% for message in messages %}
+      <div class="toast show bg-success text-white" role="alert">
+        <div class="d-flex">
+          <div class="toast-body">{{ message }}</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="glass-card">
+        <h2>🧾 Register</h2>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+
+          {% if form.errors %}
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                {% for field in form %}
+                  {% for error in field.errors %}
+                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          {% for field in form %}
+            <div class="mb-3">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {% if "password" in field.name %}
+                <div class="input-group">
+                  {{ field }}
+                  <span class="input-group-text" onclick="togglePassword('{{ field.id_for_label }}')" style="cursor:pointer;">👁️</span>
+                </div>
+              {% else %}
+                {{ field }}
+              {% endif %}
+              {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <!-- Password Strength -->
+          <div id="strengthMessage"></div>
+
+          <!-- Terms & Conditions -->
+          <div class="form-check mt-3 mb-3">
+            <input class="form-check-input" type="checkbox" id="termsCheck" required>
+            <label class="form-check-label" for="termsCheck">
+              I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+            </label>
+          </div>
+
+          <button class="btn btn-primary w-100" id="submitBtn" type="submit">
+            ✅ Create Account
+          </button>
+        </form>
+
+        <!-- Google Login Placeholder -->
+        <div class="or-divider">OR</div>
+        <a href="#" class="btn btn-light w-100 mb-3">
+          <img src="https://img.icons8.com/color/16/000000/google-logo.png"/> Sign up with Google
+        </a>
+
+        <!-- Already registered -->
+        <div class="mt-3 text-center">
+          Already have an account? <a href="{% url 'users:login' %}">Login</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Toggle password visibility
+  function togglePassword(id) {
+    const input = document.getElementById(id);
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  // Password Strength Meter
+  document.addEventListener('DOMContentLoaded', function () {
+    const pwdField = document.querySelector('input[name="password1"]');
+    const strengthMessage = document.getElementById('strengthMessage');
+
+    if (pwdField) {
+      pwdField.addEventListener('input', function () {
+        const value = this.value;
+        let strength = 0;
+
+        if (value.length > 6) strength++;
+        if (/[A-Z]/.test(value)) strength++;
+        if (/[0-9]/.test(value)) strength++;
+        if (/[\W]/.test(value)) strength++;
+
+        if (!value) {
+          strengthMessage.textContent = '';
+        } else if (strength <= 1) {
+          strengthMessage.textContent = 'Password strength: Weak';
+          strengthMessage.className = 'strength-weak';
+        } else if (strength === 2) {
+          strengthMessage.textContent = 'Password strength: Medium';
+          strengthMessage.className = 'strength-medium';
+        } else {
+          strengthMessage.textContent = 'Password strength: Strong';
+          strengthMessage.className = 'strength-strong';
+        }
+      });
+    }
+  });
+
+  // Spinner on submit
+  document.querySelector('form').addEventListener('submit', function () {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Creating...`;
+  });
+</script>
+{% endblock %}

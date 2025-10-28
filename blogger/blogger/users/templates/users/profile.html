@@ -1,0 +1,506 @@
+{% extends "users/base.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<style>
+  body {
+    background: url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Segoe UI', sans-serif;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+  }
+
+  .profile-overlay {
+    background: rgba(0, 0, 0, 0.75);
+    padding: 4rem 1rem;
+    min-height: 100vh;
+    backdrop-filter: blur(6px);
+  }
+
+  .profile-box {
+    max-width: 850px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 2rem;
+    border-radius: 24px;
+    box-shadow: 0 0 24px rgba(0, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  .avatar {
+    border: 3px solid #00f2ff;
+    box-shadow: 0 0 16px #00e5ff88;
+  }
+
+  .btn-glass {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid #0ff;
+    color: #fff;
+    transition: all 0.3s ease;
+  }
+
+  .btn-glass:hover {
+    background: #00f2ff;
+    color: #000;
+  }
+
+  .btn-logout {
+    background: rgba(255, 50, 50, 0.15);
+    border: 1px solid #ff6b6b;
+    color: #fff;
+  }
+
+  .btn-logout:hover {
+    background: #ff6b6b;
+    color: #000;
+  }
+
+  .glass-box {
+    background: rgba(255, 255, 255, 0.07);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(14px);
+    border-radius: 16px;
+    box-shadow: 0 0 24px rgba(0, 242, 255, 0.2);
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+
+  .neon-glow {
+    border-image: linear-gradient(135deg, #00f2ff, #ff00e0) 1;
+  }
+
+  .glow-heading {
+    font-size: 1.5rem;
+    text-shadow: 0 0 8px #0ff, 0 0 15px #0ff;
+    color: #fff;
+  }
+
+  .text-gradient {
+    background: linear-gradient(to right, #00f2ff, #ff00e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+  }
+
+  .progress {
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    transition: width 1.2s ease-in-out;
+  }
+
+  .list-group-item {
+    border: none;
+    border-radius: 12px !important;
+    padding: 1rem 1.25rem;
+  }
+
+  .badge {
+    border-radius: 20px;
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+  }
+
+  .btn-glass:focus,
+  .btn-glass:active {
+    box-shadow: 0 0 10px #00f2ff;
+  }
+
+  #quickSidebar {
+    position: fixed;
+    top: 60px;
+    right: -250px;
+    width: 240px;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 1rem;
+    border-radius: 12px 0 0 12px;
+    transition: right 0.3s ease-in-out;
+    z-index: 1050;
+    box-shadow: -4px 0 16px rgba(0, 255, 255, 0.2);
+  }
+
+  #quickSidebar a {
+    text-decoration: none;
+    display: block;
+    margin: 0.5rem 0;
+    color: #0ff;
+  }
+
+  #quickSidebar a:hover {
+    text-decoration: underline;
+    color: #fff;
+  }
+
+  .chart-container {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 1rem;
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.15);
+  }
+
+  .motivator {
+    font-size: 1rem;
+    text-align: center;
+    margin-top: 1rem;
+    color: #8ae3ff;
+    font-style: italic;
+    animation: fadeInUp 1s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Color Picker Style */
+  input[type="color"] {
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0,255,255,0.3);
+    outline: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .profile-box {
+      padding: 1.5rem;
+    }
+    #quickSidebar {
+      width: 200px;
+    }
+  }
+</style>
+
+<div class="profile-overlay">
+  <div class="profile-box text-center">
+    {% if user.avatar %}
+      <img src="{{ user.avatar.url }}" class="rounded-circle avatar mb-3" width="120" height="120" alt="{{ user.username }}'s avatar">
+    {% else %}
+      <img src="https://ui-avatars.com/api/?name={{ user.username }}" class="rounded-circle avatar mb-3" width="120" height="120" alt="Avatar for {{ user.username }}">
+    {% endif %}
+
+    <h2 class="mb-1">{{ user.username }}</h2>
+    <p class="mb-1"><i>{{ user.email }}</i></p>
+    <p><strong>Bio:</strong> {{ user.bio|default:"No bio added." }}</p>
+    <p><small>Joined on: {{ user.date_joined|date:"F j, Y" }}</small></p>
+
+    <div id="clock" class="fs-5 mt-2 text-info"></div>
+
+    <div class="mt-4 d-flex justify-content-center flex-wrap gap-2">
+      <a href="{% url 'users:edit_profile' %}" class="btn btn-glass px-4 py-2">✏️ Edit Profile</a>
+      <a href="{% url 'blog:post_list' %}" class="btn btn-glass px-4 py-2">← Back to Posts</a>
+      <a href="{% url 'users:logout' %}" class="btn btn-logout px-4 py-2">Logout</a>
+    </div>
+
+    <div class="mt-5 text-start" id="posts">
+      <h3>Your Posts ({{ user.post_set.count }})</h3>
+      {% if user.post_set.exists %}
+        <ul>
+          {% for post in user.post_set.all|dictsortreversed:"created_at"|slice:":3" %}
+            <li>
+              <a href="{% url 'blog:post_detail' post.pk %}">{{ post.title }}</a>
+              <small class="text-muted"> - {{ post.created_at|date:"M d, Y" }}</small>
+            </li>
+          {% endfor %}
+        </ul>
+        <a href="{% url 'blog:user_posts' user.username %}" class="btn btn-glass mt-3">See All Posts</a>
+      {% else %}
+        <p>You haven't published any posts yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- 📊 Waterglass Activity Box -->
+<div class="glass-box neon-glow p-4 mt-5">
+  <h5 class="glow-heading mb-4">📊 Your <span class="text-gradient">Activity</span></h5>
+  <ul class="list-unstyled mb-0 text-light">
+
+    <!-- Likes -->
+    <li class="mb-4">
+      ❤️ <strong class="text-danger">Likes:</strong> <span id="likesCount">0</span>
+      <div class="progress soft-shadow mt-2">
+        <div class="progress-bar bg-danger" id="likesBar" style="width: 0%;" role="progressbar"></div>
+      </div>
+    </li>
+
+    <!-- Comments -->
+    <li class="mb-4">
+      💬 <strong class="text-info">Comments:</strong> <span id="commentsCount">0</span>
+      <div class="progress soft-shadow mt-2">
+        <div class="progress-bar bg-info" id="commentsBar" style="width: 0%;" role="progressbar"></div>
+      </div>
+    </li>
+
+    <!-- Followers -->
+    <li class="mb-4">
+      👥 <strong class="text-success">Followers:</strong> <span id="followersCount">0</span>
+      {% if user.followers_count|default:0 >= 100 %}
+        <span class="badge bg-success ms-2">🌟 Influencer</span>
+      {% endif %}
+      <div class="progress soft-shadow mt-2">
+        <div class="progress-bar bg-success" id="followersBar" style="width: 0%;" role="progressbar"></div>
+      </div>
+    </li>
+
+    <!-- Posts -->
+    <li class="mb-4">
+      📝 <strong class="text-warning">Posts Written:</strong> <span id="postsCount">0</span>
+      <div class="progress soft-shadow mt-2">
+        <div class="progress-bar bg-warning" id="postsBar" style="width: 0%;" role="progressbar"></div>
+      </div>
+    </li>
+
+    <!-- Bookmarks -->
+    <li class="mb-3">
+      📥 <strong class="text-primary">Bookmarks Saved:</strong> {{ user.bookmarks_count|default:"0" }}
+    </li>
+
+    <!-- Info -->
+    <li class="mb-2">⏱️ <strong>Member Since:</strong> {{ user.date_joined|date:"F Y" }}</li>
+    <li>🔄 <strong>Last Active:</strong> {{ user.last_login|naturaltime }}</li>
+  </ul>
+</div>
+
+    <div class="mt-5 text-start">
+      <h3>📈 Posts by Month</h3>
+      <canvas id="postsChart" width="100%" height="40"></canvas>
+    </div>
+
+    <div class="mt-5 text-center">
+  <h3>🏅 Achievements</h3>
+  <div class="d-flex justify-content-center flex-wrap gap-3">
+
+    {% if user.post_set.count >= 1 %}
+      <span class="badge bg-secondary p-2">🆕 First Post</span>
+    {% endif %}
+
+    {% if user.post_set.count >= 10 %}
+      <span class="badge bg-primary p-2">✍️ Blogger Pro</span>
+    {% endif %}
+
+    {% if user.post_set.count >= 50 %}
+      <span class="badge bg-dark p-2">🏆 Master Writer</span>
+    {% endif %}
+
+    {% if user.followers_count >= 50 %}
+      <span class="badge bg-success p-2">🌟 Rising Star</span>
+    {% endif %}
+
+    {% if user.followers_count >= 100 %}
+      <span class="badge bg-success p-2">🚀 Influencer</span>
+    {% endif %}
+
+    {% if user.likes_count >= 100 %}
+      <span class="badge bg-warning text-dark p-2">🔥 Popular Post</span>
+    {% endif %}
+
+    {% if user.likes_count >= 500 %}
+      <span class="badge bg-warning text-dark p-2">💖 Viral Author</span>
+    {% endif %}
+
+    {% if user.comments_count >= 50 %}
+      <span class="badge bg-info text-dark p-2">💬 Community Voice</span>
+    {% endif %}
+
+    {% if filled == 100 %}
+      <span class="badge bg-info text-dark p-2">✅ Profile Complete</span>
+    {% endif %}
+
+    {% if user.date_joined|date:"Y" == now|date:"Y" %}
+      <span class="badge bg-light text-dark p-2">🎉 Newcomer {{ user.date_joined|date:"Y" }}</span>
+    {% endif %}
+  </div>
+</div>
+
+
+    <div class="mt-5 text-start">
+  <h3>🔄 Recent Activity</h3>
+
+  {% if user.post_set.exists or user.likes_count or user.comments %}
+  <ul class="list-group bg-transparent">
+    {% for post in user.post_set.all|dictsortreversed:"created_at"|slice:":5" %}
+    <li class="list-group-item bg-dark bg-opacity-25 border-0 text-light" style="backdrop-filter: blur(6px); border-radius: 12px; margin-bottom: 8px;">
+      📝 <strong><a href="{% url 'blog:post_detail' post.pk %}" class="text-info">{{ post.title|truncatechars:40 }}</a></strong>
+      <br>
+      <small class="text-muted">Posted {{ post.created_at|naturaltime }}</small>
+    </li>
+    {% endfor %}
+
+    {% if user.comments %}
+    <li class="list-group-item bg-dark bg-opacity-25 border-0 text-light" style="backdrop-filter: blur(6px); border-radius: 12px;">
+      💬 Commented on posts recently <span class="badge bg-secondary ms-2">+{{ user.comments_count|default:"1" }} comments</span>
+    </li>
+    {% endif %}
+
+    {% if user.likes_count > 0 %}
+    <li class="list-group-item bg-dark bg-opacity-25 border-0 text-light" style="backdrop-filter: blur(6px); border-radius: 12px;">
+      ❤️ Liked posts <span class="badge bg-danger ms-2">+{{ user.likes_count }}</span>
+    </li>
+    {% endif %}
+  </ul>
+  {% else %}
+  <div class="text-center mt-4">
+    <img src="https://cdni.iconscout.com/illustration/premium/thumb/no-activity-8048997-6483173.png" width="180" alt="No Activity Yet" class="mb-3" />
+    <p class="text-muted">No recent activity recorded yet.</p>
+    <a href="{% url 'blog:post_create' %}" class="btn btn-primary">✏️ Start Creating</a>
+  </div>
+  {% endif %}
+</div>
+
+
+    <div class="mt-5 text-center">
+      <h3>🔗 Share Profile</h3>
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.build_absolute_uri }}" alt="QR Code for Profile" />
+      <br>
+      <a href="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.build_absolute_uri }}" download="my_profile_qr.png" class="btn btn-glass mt-2">⬇️ Download QR</a>
+      <button class="btn btn-glass mt-2" onclick="copyProfileLink()">🔗 Copy Profile Link</button>
+    </div>
+
+    <div class="mt-5 text-center">
+      <button class="btn btn-glass px-4 py-2" onclick="window.print()">🖨️ Print / Save as PDF</button>
+      <button class="btn btn-glass px-4 py-2" onclick="toggleSidebar()">📜 Quick Menu</button>
+      <input type="color" id="themePicker" title="Pick a highlight color" style="margin-left:10px;">
+    </div>
+  </div>
+</div>
+
+<div id="quickSidebar">
+  <h5>Quick Menu</h5>
+  <ul class="list-unstyled">
+    <li><a href="#clock" class="text-info">🕒 Time</a></li>
+    <li><a href="#activity" class="text-info">📊 Activity</a></li>
+    <li><a href="#posts" class="text-info">📝 Posts</a></li>
+    <li><a href="#completion" class="text-info">✅ Profile</a></li>
+  </ul>
+  <hr>
+  <button onclick="toggleSidebar()" class="btn btn-sm btn-outline-light">❌ Close</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function updateClock() {
+  const now = new Date();
+  document.getElementById("clock").textContent = now.toLocaleTimeString();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function toggleSidebar() {
+  const sidebar = document.getElementById("quickSidebar");
+  sidebar.style.right = sidebar.style.right === "0px" ? "-250px" : "0px";
+}
+
+document.getElementById("themePicker").addEventListener("input", function () {
+  document.querySelectorAll('.btn-glass').forEach(btn => {
+    btn.style.backgroundColor = this.value + "88";
+    btn.style.borderColor = this.value;
+  });
+  localStorage.setItem("profileColor", this.value);
+});
+
+function copyProfileLink() {
+  navigator.clipboard.writeText(window.location.href);
+  alert("🔗 Profile link copied!");
+}
+
+function animateCount(id, target, speed = 20) {
+  let current = 0;
+  const element = document.getElementById(id);
+  const interval = setInterval(() => {
+    if (current >= target) clearInterval(interval);
+    else {
+      current += 1;
+      element.textContent = current;
+    }
+  }, speed);
+}
+
+// Chart.js for posts by month
+const postsChartCtx = document.getElementById('postsChart');
+if (postsChartCtx) {
+  new Chart(postsChartCtx, {
+    type: 'bar',
+    data: {
+      labels: {{ months|safe }},
+      datasets: [{
+        label: 'Posts',
+        data: {{ monthly_post_counts|safe }},
+        backgroundColor: 'rgba(0, 255, 255, 0.6)',
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
+ function animateCount(id, barId, value, speed = 20) {
+    let count = 0;
+    const el = document.getElementById(id);
+    const bar = document.getElementById(barId);
+    const interval = setInterval(() => {
+      if (count >= value) {
+        clearInterval(interval);
+        el.textContent = value;
+        bar.style.width = (value > 100 ? 100 : value) + '%';
+      } else {
+        count++;
+        el.textContent = count;
+        bar.style.width = (count > 100 ? 100 : count) + '%';
+      }
+    }, speed);
+  }
+
+  // Extract values from Django context
+  const likes = {{ user.likes_count|default:0 }};
+  const comments = {{ user.comments_count|default:0 }};
+  const followers = {{ user.followers_count|default:0 }};
+  const posts = {{ user.posts_count|default:0 }};
+
+  // Run animations
+  animateCount('likesCount', 'likesBar', likes);
+  animateCount('commentsCount', 'commentsBar', comments);
+  animateCount('followersCount', 'followersBar', followers);
+  animateCount('postsCount', 'postsBar', posts);
+  function animateActivityBar(id, count) {
+  let width = 0;
+  const target = Math.min(count, 100);  // Clamp to 100 max for bar
+  const bar = document.getElementById(id + 'Bar');
+  const countText = document.getElementById(id + 'Count');
+  const interval = setInterval(() => {
+    if (width >= target) clearInterval(interval);
+    else {
+      width++;
+      bar.style.width = width + '%';
+      countText.textContent = width;
+    }
+  }, 15);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  animateActivityBar('likes', {{ user.likes_count|default:"0" }});
+  animateActivityBar('comments', {{ user.comments_count|default:"0" }});
+  animateActivityBar('followers', {{ user.followers_count|default:"0" }});
+  animateActivityBar('posts', {{ user.posts_count|default:"0" }});
+});
+</script>
+{% endblock %}

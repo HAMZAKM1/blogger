@@ -1,0 +1,188 @@
+{% extends 'users/base.html' %}
+{% load static %}
+
+{% block title %}Posts by {{ author.username }}{% endblock %}
+
+{% block content %}
+<video autoplay muted loop id="bgVideo" class="fullscreen-bg">
+  <source src="{% static 'videos/bg.mp4' %}" type="video/mp4">
+</video>
+
+<div class="glass-container">
+  <h2 class="heading">📝 Posts by <span class="username">{{ author.username }}</span></h2>
+
+  <!-- Live Search -->
+  <div class="mb-4">
+    <input type="text" class="form-control bg-dark text-light" placeholder="🔍 Search posts..." id="searchInput">
+  </div>
+
+  {% if posts %}
+    <div class="post-list" id="postList">
+      {% for post in posts %}
+        <div class="post-card animate" data-title="{{ post.title|lower }}">
+          <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+          <p class="meta">🗓 {{ post.created_at|date:"M d, Y H:i" }} &nbsp; ⏱ {{ post.content|wordcount|divisibleby:200|yesno:"1,~1.5,2"|floatformat:1 }} min read</p>
+          <p>{{ post.content|truncatewords:30 }}</p>
+
+          {% if post.tags.all %}
+            <div class="tags mb-2">
+              {% for tag in post.tags.all %}
+                <span class="badge bg-info text-dark">#{{ tag.name }}</span>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <a href="{% url 'post_detail' post.pk %}" class="read-more">Read More →</a>
+            <div class="actions">
+              <button class="btn btn-sm btn-outline-info" onclick="copyLink('{{ request.build_absolute_uri|slice:':-1' }}{% url 'post_detail' post.pk %}')">📋</button>
+              <a class="btn btn-sm btn-outline-light" href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|slice:':-1' }}{% url 'post_detail' post.pk %}&text={{ post.title }}" target="_blank">🐦</a>
+              <a class="btn btn-sm btn-outline-light" href="https://wa.me/?text={{ request.build_absolute_uri|slice:':-1' }}{% url 'post_detail' post.pk %}" target="_blank">💬</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      {% if posts.has_previous %}
+        <a href="?page={{ posts.previous_page_number }}">← Previous</a>
+      {% endif %}
+      <span>Page {{ posts.number }} of {{ posts.paginator.num_pages }}</span>
+      {% if posts.has_next %}
+        <a href="?page={{ posts.next_page_number }}">Next →</a>
+      {% endif %}
+    </div>
+  {% else %}
+    <p class="text-light">No posts found for this user.</p>
+  {% endif %}
+</div>
+
+<!-- Clock Widget -->
+<div id="clockBox" class="text-center text-info mt-4 mb-2 fs-6">🕒 <span id="clock"></span></div>
+
+<!-- Scroll to Top Button -->
+<button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="scroll-top">⬆</button>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.fullscreen-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  filter: brightness(0.3);
+}
+.glass-container {
+  max-width: 850px;
+  margin: 90px auto;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 0 24px rgba(0,255,255,0.3);
+  color: #fff;
+}
+.heading {
+  text-align: center;
+  font-size: 2rem;
+  color: #0ff;
+  margin-bottom: 2rem;
+}
+.username {
+  color: #ffd700;
+}
+.post-card {
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 12px rgba(0,255,255,0.1);
+  transition: transform 0.3s ease;
+}
+.post-card:hover {
+  transform: scale(1.02);
+}
+.post-card h3 {
+  margin: 0 0 0.5rem;
+  color: #0ff;
+}
+.post-card .meta {
+  font-size: 0.9rem;
+  color: #ccc;
+}
+.read-more {
+  color: #0ff;
+  text-decoration: none;
+  font-weight: bold;
+}
+.read-more:hover {
+  text-decoration: underline;
+}
+.tags .badge {
+  margin-right: 5px;
+}
+.pagination {
+  text-align: center;
+  margin-top: 2rem;
+  color: #fff;
+}
+.pagination a {
+  color: #0ff;
+  text-decoration: none;
+  margin: 0 10px;
+}
+.scroll-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #0ff;
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  padding: 0.6rem 1rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 0 12px #0ff;
+}
+.scroll-top:hover {
+  background: #00bcd4;
+}
+.animate {
+  animation: fadeIn 0.5s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Live Search
+  document.getElementById('searchInput').addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+    document.querySelectorAll('.post-card').forEach(card => {
+      const title = card.getAttribute('data-title');
+      card.style.display = title.includes(query) ? 'block' : 'none';
+    });
+  });
+
+  // Copy link
+  function copyLink(url) {
+    navigator.clipboard.writeText(url);
+    alert("📋 Post link copied!");
+  }
+
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    document.getElementById("clock").textContent = now.toLocaleTimeString();
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+</script>
+{% endblock %}

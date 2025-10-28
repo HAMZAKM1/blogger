@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Delete Post{% endblock %}
+
+{% block content %}
+<style>
+  .confirm-delete-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 1050;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .confirm-delete-box {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    border-radius: 18px;
+    padding: 35px 45px;
+    max-width: 540px;
+    width: 100%;
+    color: #fff;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 0 28px rgba(255, 0, 0, 0.2);
+    animation: zoomIn 0.4s ease;
+  }
+
+  @keyframes zoomIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .confirm-delete-icon {
+    font-size: 4rem;
+    color: #ff6b6b;
+    animation: shake 1.2s infinite alternate;
+    margin-bottom: 15px;
+  }
+
+  @keyframes shake {
+    0% { transform: rotate(-1deg); }
+    100% { transform: rotate(1deg); }
+  }
+
+  .btn-danger, .btn-secondary {
+    padding: 10px 25px;
+    font-weight: bold;
+    border: none;
+    transition: 0.3s;
+    border-radius: 6px;
+  }
+
+  .btn-danger {
+    background: #ff4d4d;
+    color: white;
+  }
+  .btn-danger:hover {
+    background: #e84118;
+    box-shadow: 0 0 8px #e84118;
+  }
+
+  .btn-secondary {
+    background: #57606f;
+    color: white;
+  }
+  .btn-secondary:hover {
+    background: #747d8c;
+    box-shadow: 0 0 8px #747d8c;
+  }
+
+  .countdown-bar {
+    height: 6px;
+    width: 100%;
+    background: rgba(255,255,255,0.2);
+    margin-top: 15px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .countdown-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(to right, #ff6b6b, #ff4757);
+    animation: countdownAnim 10s linear forwards;
+  }
+
+  @keyframes countdownAnim {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
+
+  .meta-summary {
+    font-size: 0.9rem;
+    color: #ccc;
+    margin-bottom: 1rem;
+  }
+
+  .feedback-option {
+    font-size: 0.9rem;
+    color: #bbb;
+    margin-top: 15px;
+  }
+
+  @media (max-width: 576px) {
+    .confirm-delete-box { padding: 25px 20px; }
+    .confirm-delete-icon { font-size: 3rem; }
+  }
+</style>
+
+<div class="confirm-delete-overlay" role="dialog" aria-modal="true" aria-labelledby="confirmDeleteTitle">
+  <div class="confirm-delete-box">
+    <div class="confirm-delete-icon" aria-hidden="true">⚠️</div>
+    <h4 id="confirmDeleteTitle">Confirm deletion of<br><strong>"{{ post.title }}"</strong></h4>
+
+    <div class="meta-summary">
+      📝 Created: {{ post.created_at|date:"M d, Y" }}<br>
+      👁️ Views: {{ post.view_count|default:"N/A" }} | 💬 Comments: {{ post.comment_set.count }}
+    </div>
+
+    <form method="post" aria-describedby="countdownDesc">
+      {% csrf_token %}
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <button type="submit" class="btn btn-danger" id="confirmBtn">Yes, delete</button>
+        <a href="{{ post.get_absolute_url }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
+      </div>
+
+      <div class="countdown-bar mt-4"><div class="countdown-fill"></div></div>
+      <p id="countdownDesc" class="countdown-text">Auto-redirecting to post in <span id="countdown">10</span> seconds...</p>
+
+      <div class="feedback-option">
+        <input type="checkbox" id="reason" name="reason" />
+        <label for="reason"> I deleted this by mistake</label>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let countdown = 10;
+  const countdownEl = document.getElementById('countdown');
+  const redirectUrl = "{{ post.get_absolute_url|escapejs }}";
+  const cancelBtn = document.getElementById('cancelBtn');
+
+  cancelBtn.focus();
+
+  let interval = setInterval(() => {
+    countdown--;
+    countdownEl.textContent = countdown;
+    if (countdown <= 0) {
+      clearInterval(interval);
+      window.location.href = redirectUrl;
+    }
+  }, 1000);
+
+  // Pause countdown on hover
+  document.querySelector('.confirm-delete-box').addEventListener('mouseenter', () => clearInterval(interval));
+  cancelBtn.addEventListener('click', () => clearInterval(interval));
+
+  // Escape key = cancel
+  document.addEventListener('keydown', e => {
+    if (e.key === "Escape") window.location.href = redirectUrl;
+  });
+</script>
+{% endblock %}

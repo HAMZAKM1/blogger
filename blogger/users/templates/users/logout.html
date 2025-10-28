@@ -1,0 +1,208 @@
+{% extends 'users/base.html' %}
+{% load static %}
+{% block title %}Logout - Blogger{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    background: linear-gradient(135deg, #0d1b2a, #1b263b);
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  @keyframes gradientFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .logout-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 2rem;
+    position: relative;
+  }
+
+  .logout-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    animation: fadeInZoom 0.6s ease;
+  }
+
+  @keyframes fadeInZoom {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .logout-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #0ff;
+    animation: glowPulse 2s infinite;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { text-shadow: 0 0 8px #0ff; }
+    50% { text-shadow: 0 0 18px #0ff; }
+  }
+
+  .btn-glass {
+    display: inline-block;
+    margin: 0.5rem;
+    padding: 0.6rem 1.5rem;
+    border-radius: 30px;
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    color: #0ff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-glass:hover, .btn-glass:focus {
+    background: rgba(0, 255, 255, 0.3);
+    transform: scale(1.05);
+    color: #fff;
+    outline: none;
+  }
+
+  .small-text {
+    font-size: 0.9rem;
+    color: #ccc;
+    margin-top: 1rem;
+  }
+
+  .cancel-redirect {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #f88;
+    margin-left: 0.3rem;
+  }
+
+  .cancel-redirect:hover, .cancel-redirect:focus {
+    color: #fff;
+    outline: none;
+  }
+
+  .confetti-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .logout-card h2 {
+    background: linear-gradient(90deg, #0ff, #6cf, #0ff);
+    background-size: 200% auto;
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    animation: gradientText 4s ease infinite;
+  }
+
+  @keyframes gradientText {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+</style>
+
+<div class="logout-container">
+  <canvas id="confetti" class="confetti-canvas" aria-hidden="true"></canvas>
+
+  <div class="logout-card" role="alert" aria-live="polite">
+    <div class="logout-icon">✅</div>
+    <h2 class="mb-3">You've been logged out successfully!</h2>
+    <p class="mb-4">Thank you for visiting. We hope to see you again soon. 👋</p>
+
+    <a href="{% url 'users:login' %}" class="btn-glass" title="Login again">🔐 Login Again</a>
+    <a href="{% url 'post_list' %}" class="btn-glass" title="Go back to home">🏠 Back to Home</a>
+
+    <p class="small-text">
+      Redirecting to login in <span id="countdown">10</span> seconds.
+      <span class="cancel-redirect" onclick="cancelRedirect()" tabindex="0" role="button" aria-label="Cancel redirect">Cancel Redirect</span>
+    </p>
+  </div>
+</div>
+
+<script>
+  let countdown = 10;
+  let cancelled = false;
+  const countdownEl = document.getElementById('countdown');
+
+  const interval = setInterval(() => {
+    if (!cancelled) {
+      countdown--;
+      countdownEl.textContent = countdown;
+      if (countdown <= 0) {
+        clearInterval(interval);
+        window.location.href = "{% url 'users:login' %}";
+      }
+    }
+  }, 1000);
+
+  function cancelRedirect() {
+    cancelled = true;
+    countdownEl.textContent = '❌';
+    document.querySelector('.cancel-redirect').textContent = 'Redirect cancelled';
+  }
+
+  // Optional: logout success sound
+  document.addEventListener("DOMContentLoaded", () => {
+    const audio = new Audio("{% static 'audio/logout-success.mp3' %}");
+    audio.volume = 0.4;
+    audio.play().catch(() => {});
+    startConfetti();
+  });
+
+  // 🎉 Confetti effect using canvas
+  function startConfetti() {
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 80 + 20,
+        color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+        tilt: Math.random() * 10 - 5
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.fillStyle = p.color;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        p.y += Math.cos(p.d / 15) + 1 + p.r / 2;
+        p.x += Math.sin(p.d / 20);
+        if (p.y > canvas.height) {
+          p.y = -10;
+          p.x = Math.random() * canvas.width;
+        }
+      });
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+</script>
+{% endblock %}

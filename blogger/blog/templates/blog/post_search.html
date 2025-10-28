@@ -1,0 +1,24 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-info">🔍 Search Results</h2>
+
+  {% if query %}
+    <p>Results for "<strong>{{ query }}</strong>":</p>
+    <div class="list-group">
+      {% if results %}
+        {% for post in results %}
+          <a href="{% url 'blog:post_detail' post.pk %}" class="list-group-item list-group-item-action">
+            {{ post.title }}
+          </a>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted">No posts found matching your query.</p>
+      {% endif %}
+    </div>
+  {% else %}
+    <p class="text-warning">Please enter a search term.</p>
+  {% endif %}
+</div>
+{% endblock %}

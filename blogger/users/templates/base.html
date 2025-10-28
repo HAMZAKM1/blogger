@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}Blogger{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#00b894" />
+  <meta name="description" content="Share your thoughts, stories, and creativity with Blogger." />
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3565/3565418.png" type="image/png" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+  <style>
+  body {
+    background: url('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Segoe UI', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .overlay {
+    background-color: rgba(0, 0, 0, 0.65);
+    min-height: 100vh;
+    padding-bottom: 50px;
+  }
+
+  .navbar-nav .nav-link:hover {
+    color: #00b894;
+    text-shadow: 0 0 6px #00ffcc;
+  }
+
+  .dark-mode body {
+    background-color: #121212;
+    color: #e0e0e0;
+  }
+
+  .dark-mode .overlay {
+    background-color: rgba(18, 18, 18, 0.85);
+  }
+
+  .dark-mode .navbar, .dark-mode footer {
+    background-color: #1f1f1f !important;
+  }
+
+  .dark-toggle {
+    cursor: pointer;
+    color: #fff;
+    background: none;
+    font-size: 1.2rem;
+    border: none;
+  }
+
+  .welcome-banner {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  #scrollTopBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: none;
+    z-index: 1100;
+    border-radius: 50%;
+    padding: 12px 16px;
+    font-size: 1.5rem;
+    background-color: #00b894;
+    color: white;
+    border: none;
+    box-shadow: 0 0 10px #00b894;
+  }
+
+  .chat-btn {
+    position: fixed;
+    bottom: 90px;
+    right: 30px;
+    z-index: 1100;
+    border-radius: 50%;
+    font-size: 1.7rem;
+    padding: 14px 18px;
+    background-color: #28a745;
+    color: white;
+    box-shadow: 0 0 10px #28a745;
+  }
+
+  footer {
+    background: rgba(0, 0, 0, 0.8);
+    color: #ccc;
+    font-size: 0.9rem;
+    padding: 10px 0;
+  }
+
+  .notify-glow {
+    animation: glowPulse 1.5s infinite;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% {
+      text-shadow: 0 0 6px #ff6b6b, 0 0 12px #ff6b6b;
+    }
+    50% {
+      text-shadow: 0 0 8px #ff6b6b, 0 0 18px #ff6b6b;
+    }
+  }
+
+  /* ✅ Waterglass Box */
+  .waterglass-box {
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(0, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: #fff;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 24px rgba(0, 255, 255, 0.15);
+  }
+
+  /* ✅ Glowing Headings */
+  .glow-heading {
+    background: linear-gradient(90deg, #0ff, #00ff88, #0ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+  }
+
+  /* ✅ Neon Outline Button */
+  .btn-neon {
+    border: 2px solid #0ff;
+    color: #0ff;
+    background: transparent;
+    padding: 0.5rem 1.2rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+  }
+
+  .btn-neon:hover {
+    background-color: #0ff;
+    color: #000;
+    box-shadow: 0 0 15px #0ff, 0 0 30px #0ff;
+  }
+
+  /* ✅ Animated Text Gradient */
+  .rainbow-text {
+    background: linear-gradient(270deg, #ff00ff, #00ffff, #00ff88, #ffff00, #ff00ff);
+    background-size: 800% 800%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rainbow 6s ease infinite;
+  }
+
+  @keyframes rainbow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* ✅ Glass Card */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 24px rgba(0, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+  }
+
+  /* ✅ Divider Bar */
+  .highlight-bar {
+    height: 6px;
+    border-radius: 8px;
+    background: linear-gradient(to right, #00f0ff, #0f0);
+    box-shadow: 0 0 12px #00f0ff;
+    margin: 1.5rem auto;
+  }
+
+  /* ✅ Neon Badge */
+  .neon-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 25px;
+    background: linear-gradient(to right, #00f2ff, #0ff);
+    box-shadow: 0 0 10px #00f2ff;
+    color: #000;
+    font-weight: 600;
+  }
+</style>
+
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+<div class="overlay flex-grow-1">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="{% url 'blog:post_list' %}">📝 Blogger</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <form class="d-flex me-3" method="get" action="{% url 'blog:post_search' %}">
+          <input class="form-control form-control-sm me-2" type="search" name="q" placeholder="Search..." aria-label="Search">
+          <button class="btn btn-outline-light btn-sm" type="submit">🔍</button>
+        </form>
+
+        <ul class="navbar-nav align-items-center gap-2">
+          {% if user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="exploreDropdown" role="button" data-bs-toggle="dropdown">📂 Explore</a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li><a class="dropdown-item" href="{% url 'blog:post_list' %}">📚 All Posts</a></li>
+              <li><a class="dropdown-item" href="{% url 'blog:post_create' %}">➕ Create Post</a></li>
+              <li><a class="dropdown-item" href="#">🔥 Trending</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+              <span class="me-2">👤</span>{{ user.username }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+              <li><a class="dropdown-item" href="{% url 'users:profile' %}">👤 Profile</a></li>
+              <li><a class="dropdown-item" href="{% url 'users:user_posts' user.username %}">🗂 My Posts</a></li>
+              <li><a class="dropdown-item" href="{% url 'users:edit_profile' %}">⚙️ Edit Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'users:settings' %}">🔧 Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="{% url 'users:logout' %}">🚪 Logout</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link position-relative {% if unread_count and unread_count > 0 %}notify-glow{% endif %}" href="{% url 'users:notifications' %}" title="Notifications">
+              🔔
+              {% if unread_count and unread_count > 0 %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  {{ unread_count }}
+                </span>
+              {% endif %}
+            </a>
+          </li>
+
+          <li class="nav-item text-light d-none d-lg-block">
+            🕒 <span id="liveClock" style="font-size: 0.9rem;"></span>
+          </li>
+          {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'users:login' %}">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'users:register' %}">Register</a></li>
+          {% endif %}
+
+          <li class="nav-item">
+            <button class="nav-link btn btn-link p-0 dark-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode">
+              <span id="darkIcon">🌗</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mt-4">
+    <section class="welcome-banner text-center py-5 mb-4">
+      <h2 class="fw-bold">📚 Welcome to Blogger!</h2>
+      <p class="lead" id="motivationText">Share your thoughts, stories, and creativity with the world.</p>
+    </section>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<!-- Scroll & Chat Buttons -->
+<button id="scrollTopBtn" title="Scroll to top">⬆️</button>
+<a href="mailto:contact@yourblog.com" class="chat-btn" title="Contact us via email">💬</a>
+
+<footer class="text-center mt-auto">
+  © 2025 Blogger. All rights reserved. | Made with ❤️ by Hamza
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function toggleDarkMode() {
+    const icon = document.getElementById('darkIcon');
+    const isDark = document.body.classList.toggle('dark-mode');
+    icon.textContent = isDark ? '🌞' : '🌗';
+    localStorage.setItem('darkMode', isDark);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark-mode');
+      document.getElementById('darkIcon').textContent = '🌞';
+    }
+
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('liveClock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }, 1000);
+
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+      scrollBtn.style.display = window.scrollY > 300 ? 'block' : 'none';
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    const quotes = [
+      "Write. Inspire. Repeat.",
+      "Let your words change the world 🌍",
+      "Every blog starts with a thought 💭",
+      "Pen your passion, post your purpose ✒️",
+      "Create something today ✨"
+    ];
+    let i = 0;
+    setInterval(() => {
+      document.getElementById("motivationText").textContent = quotes[i];
+      i = (i + 1) % quotes.length;
+    }, 4000);
+  });
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

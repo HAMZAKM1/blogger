@@ -1,0 +1,205 @@
+{% extends "users/base.html" %}
+{% load static %}
+{% block title %}Edit Profile - Blogger{% endblock %}
+
+{% block content %}
+<style>
+  .edit-profile-overlay {
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+    min-height: 100vh;
+    padding: 60px 20px;
+    color: #fff;
+  }
+
+  .edit-profile-box {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    box-shadow: 0 0 18px rgba(0, 255, 255, 0.2);
+    max-width: 650px;
+    margin: auto;
+    animation: fadeIn 0.8s ease-in-out;
+  }
+
+  .form-floating > .form-control, 
+  .form-floating > .form-select {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid #aaa;
+  }
+
+  .form-control::placeholder {
+    color: transparent;
+  }
+
+  .form-floating > label {
+    color: #ccc;
+  }
+
+  .form-control:focus {
+    border-color: #00cec9;
+    box-shadow: 0 0 0 0.2rem rgba(0, 206, 201, 0.25);
+  }
+
+  .btn-save {
+    background-color: #00cec9;
+    border: none;
+    color: #000;
+    padding: 10px 24px;
+    border-radius: 8px;
+    transition: 0.3s;
+  }
+
+  .btn-save:hover {
+    background-color: #00b6b2;
+  }
+
+  .preview-img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #00cec9;
+    margin-top: 10px;
+  }
+
+  .char-count {
+    font-size: 0.85rem;
+    color: #ccc;
+  }
+
+  .tooltip-custom {
+    color: #888;
+    font-size: 0.8rem;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<div class="edit-profile-overlay">
+  <div class="edit-profile-box">
+    <h2 class="mb-4">✏️ Edit Your Profile</h2>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      <!-- Username -->
+      <div class="form-floating mb-3">
+        {{ form.username }}
+        <label for="id_username">Username</label>
+        {% for error in form.username.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Email -->
+      <div class="form-floating mb-3">
+        {{ form.email }}
+        <label for="id_email">Email</label>
+        {% for error in form.email.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Profile Image Upload -->
+      <div class="mb-3">
+        <label class="form-label" for="id_avatar">Profile Image (Max 2MB, JPG/PNG)</label>
+        {{ form.avatar }}
+        {% if user.profile.image %}
+          <div>
+            <img src="{{ user.profile.image.url }}" alt="Current Avatar" class="preview-img" id="currentAvatar">
+          </div>
+        {% endif %}
+        <img id="preview" class="preview-img d-none" alt="New Preview">
+        <div class="tooltip-custom">Click 'Reset' to discard the new image before saving.</div>
+        <button type="button" class="btn btn-sm btn-outline-light mt-2" id="resetAvatarBtn" style="display:none;">↩️ Reset</button>
+        {% for error in form.avatar.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Bio -->
+      <div class="form-floating mb-3">
+        {{ form.bio }}
+        <label for="id_bio">Bio</label>
+        <div class="char-count" id="bio-count">0 / 300</div>
+        {% for error in form.bio.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Social -->
+      <div class="form-floating mb-3">
+        {{ form.social_link }}
+        <label for="id_social_link">Social Link</label>
+        {% for error in form.social_link.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+        <div class="tooltip-custom mt-1">Preview: <a href="#" id="socialPreview" target="_blank" rel="noopener noreferrer">Link</a></div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="mt-4">
+        <button type="submit" class="btn btn-save">💾 Save Changes</button>
+        <a href="{% url 'users:profile' %}" class="btn btn-outline-light ms-3">← Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Preview profile image
+  const avatarInput = document.getElementById("id_avatar");
+  const preview = document.getElementById("preview");
+  const resetBtn = document.getElementById("resetAvatarBtn");
+
+  avatarInput.addEventListener("change", function () {
+    const file = this.files[0];
+    if (file && file.size < 2 * 1024 * 1024 && /\.(jpe?g|png)$/i.test(file.name)) {
+      preview.src = URL.createObjectURL(file);
+      preview.classList.remove("d-none");
+      resetBtn.style.display = "inline-block";
+    } else {
+      alert("Please upload a valid image file under 2MB.");
+      this.value = "";
+    }
+  });
+
+  resetBtn.addEventListener("click", function () {
+    avatarInput.value = "";
+    preview.src = "";
+    preview.classList.add("d-none");
+    this.style.display = "none";
+  });
+
+  // Character count for bio
+  const bioInput = document.getElementById("id_bio");
+  const countDisplay = document.getElementById("bio-count");
+
+  if (bioInput && countDisplay) {
+    bioInput.addEventListener("input", () => {
+      countDisplay.textContent = `${bioInput.value.length} / 300`;
+    });
+    countDisplay.textContent = `${bioInput.value.length} / 300`;
+  }
+
+  // Live social link preview
+  const socialLinkInput = document.getElementById("id_social_link");
+  const socialPreview = document.getElementById("socialPreview");
+
+  if (socialLinkInput && socialPreview) {
+    function updateLinkPreview() {
+      const link = socialLinkInput.value;
+      socialPreview.href = link.startsWith("http") ? link : "https://" + link;
+      socialPreview.textContent = socialPreview.href;
+    }
+
+    socialLinkInput.addEventListener("input", updateLinkPreview);
+    updateLinkPreview();
+  }
+</script>
+{% endblock %}

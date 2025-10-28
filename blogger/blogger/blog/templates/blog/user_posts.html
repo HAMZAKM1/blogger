@@ -1,0 +1,155 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Posts by {{ author.username }}{% endblock %}
+
+{% block content %}
+<video autoplay muted loop id="bgVideo" class="fullscreen-bg">
+  <source src="{% static 'videos/bg.mp4' %}" type="video/mp4">
+</video>
+
+<div class="glass-container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="heading">
+      📝 Posts by <span class="username">{{ author.username }}</span>
+      {% if author.is_superuser %}
+        <span class="badge bg-danger">Admin</span>
+      {% elif author.groups.first.name %}
+        <span class="badge bg-info">{{ author.groups.first.name }}</span>
+      {% endif %}
+    </h2>
+    <form method="get" class="d-flex gap-2">
+      <input type="text" name="q" class="form-control form-control-sm" placeholder="Search user posts..." />
+      <button type="submit" class="btn btn-outline-info btn-sm">🔍</button>
+    </form>
+  </div>
+
+  <p class="text-light small">📦 Total Posts: {{ posts.paginator.count }}</p>
+
+  {% if posts %}
+    <div class="post-list">
+      {% for post in posts %}
+        <div class="post-card">
+          <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+          <p class="meta">
+            🕒 {{ post.created_at|naturaltime }} &nbsp;|&nbsp; ❤️ {{ post.likes_count|default:0 }} likes
+          </p>
+          <p>{{ post.content|truncatewords:30 }}</p>
+          {% if post.tags.all %}
+          <p>
+            {% for tag in post.tags.all %}
+              <span class="badge rounded-pill bg-info text-dark">#{{ tag.name }}</span>
+            {% endfor %}
+          </p>
+          {% endif %}
+          <a href="{% url 'post_detail' post.pk %}" class="read-more">➡️ Read More</a>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      {% if posts.has_previous %}
+        <a href="?page={{ posts.previous_page_number }}">← Previous</a>
+      {% endif %}
+      <span>Page {{ posts.number }} of {{ posts.paginator.num_pages }}</span>
+      {% if posts.has_next %}
+        <a href="?page={{ posts.next_page_number }}">Next →</a>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="alert alert-warning mt-4">⚠️ No posts found for this user.</div>
+  {% endif %}
+</div>
+
+<!-- Scroll to Top Button -->
+<button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="scroll-top" title="Scroll to top">⬆</button>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.fullscreen-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  filter: brightness(0.3);
+}
+.glass-container {
+  max-width: 850px;
+  margin: 90px auto;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 0 24px rgba(0,255,255,0.3);
+  color: #fff;
+}
+.heading {
+  font-size: 1.8rem;
+  color: #0ff;
+}
+.username {
+  color: #ffd700;
+}
+.post-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 16px rgba(0,255,255,0.1);
+}
+.post-card:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-3px);
+}
+.post-card h3 a {
+  color: #00eaff;
+  text-decoration: none;
+}
+.post-card .meta {
+  font-size: 0.85rem;
+  color: #ccc;
+  margin: 0.4rem 0 1rem;
+}
+.read-more {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-weight: bold;
+  color: #0ff;
+  text-decoration: none;
+}
+.read-more:hover {
+  text-decoration: underline;
+}
+.pagination {
+  text-align: center;
+  margin-top: 2rem;
+  color: #fff;
+}
+.pagination a {
+  color: #0ff;
+  text-decoration: none;
+  margin: 0 10px;
+}
+.scroll-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #0ff;
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  padding: 0.6rem 1rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 0 12px #0ff;
+}
+.scroll-top:hover {
+  background: #00bcd4;
+}
+</style>
+{% endblock %}

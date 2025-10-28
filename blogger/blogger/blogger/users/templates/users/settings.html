@@ -1,0 +1,245 @@
+
+{% extends "users/base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  body {
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .settings-container {
+    max-width: 700px;
+    margin: 60px auto;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 40px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 20px rgba(0, 255, 255, 0.2);
+    animation: slideUp 0.8s ease-in-out;
+  }
+
+  .settings-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #0ff;
+  }
+
+  .profile-pic {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid #0ff;
+    margin-bottom: 10px;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+  }
+
+  .info-label {
+    font-weight: bold;
+  }
+
+  .btn {
+    margin-top: 10px;
+    font-weight: 500;
+  }
+
+  .btn-copy {
+    background: none;
+    border: none;
+    color: #0ff;
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  .progress-container {
+    margin-top: 30px;
+  }
+
+  .progress {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    height: 20px;
+  }
+
+  .progress-bar {
+    background: linear-gradient(90deg, #00feba, #5bff96);
+    height: 100%;
+    text-align: center;
+    font-weight: bold;
+    color: #000;
+  }
+
+  .quick-actions {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .quick-actions a {
+    display: inline-block;
+    margin: 5px 10px;
+    color: #0ff;
+    text-decoration: none;
+  }
+
+  .security-tip {
+    background: rgba(255, 255, 255, 0.1);
+    margin-top: 30px;
+    padding: 15px;
+    border-left: 5px solid #ff7675;
+    border-radius: 10px;
+  }
+
+  .mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #000;
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 1.4rem;
+    z-index: 1000;
+    box-shadow: 0 0 10px #0ff;
+  }
+
+  .clock-box {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: #ccc;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+</style>
+
+<div class="settings-container" role="main" aria-label="User Account Settings">
+  <h2>⚙️ Account Settings</h2>
+  <hr>
+
+  <div class="text-center profile-pic-container" aria-label="User Profile Picture">
+    {% if user.avatar %}
+      <img src="{{ user.avatar.url }}" alt="{{ user.username }}'s profile picture" class="profile-pic" />
+    {% else %}
+      <img src="{% static 'images/default-avatar.png' %}" alt="Default avatar" class="profile-pic" />
+    {% endif %}
+    <br>
+    <a href="{% url 'users:edit_profile' %}" class="btn btn-outline-light">Change Profile Picture</a>
+  </div>
+
+  <div class="info-row">
+    <div class="info-label">👤 Username:</div>
+    <div class="info-value" id="username">{{ user.username }}</div>
+  </div>
+
+  <div class="info-row" aria-live="polite">
+    <div class="info-label">📧 Email:</div>
+    <div class="info-value" id="emailText">{{ user.email }}</div>
+    <button class="btn-copy" onclick="copyEmail()" aria-label="Copy email">📋</button>
+  </div>
+
+  <div class="info-row">
+    <div class="info-label">📅 Joined:</div>
+    <div class="info-value">{{ user.date_joined|date:"F d, Y" }}</div>
+  </div>
+
+  <div class="info-row">
+    <div class="info-label">🕓 Last Login:</div>
+    <div class="info-value">{{ user.last_login|date:"F d, Y, h:i A" }}</div>
+  </div>
+
+  {% if user.social_link %}
+  <div class="info-row">
+    <div class="info-label">🔗 Social Link:</div>
+    <div class="info-value">
+      <a href="{{ user.social_link }}" target="_blank" class="text-info">{{ user.social_link }}</a>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="mt-4 text-center d-flex justify-content-center gap-3 flex-wrap">
+    <a href="{% url 'users:edit_profile' %}" class="btn btn-info">✏️ Edit Profile</a>
+    <a href="{% url 'password_change' %}" class="btn btn-warning">🔐 Change Password</a>
+    <a href="{% url 'users:logout' %}" class="btn btn-danger">🚪 Logout</a>
+  </div>
+
+  <!-- Completion Bar -->
+  <div class="progress-container mt-4">
+    <div class="progress-label">✅ Profile Completion</div>
+    {% with filled=0 %}
+      {% if user.avatar %}{% with filled=filled|add:"25" %}{% endwith %}{% endif %}
+      {% if user.email %}{% with filled=filled|add:"25" %}{% endwith %}{% endif %}
+      {% if user.bio %}{% with filled=filled|add:"25" %}{% endwith %}{% endif %}
+      {% if user.social_link %}{% with filled=filled|add:"25" %}{% endwith %}{% endif %}
+    {% endwith %}
+    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ filled }}">
+      <div class="progress-bar" style="width: {{ filled }}%;">{{ filled }}%</div>
+    </div>
+  </div>
+
+  <!-- Extra Tools -->
+  <div class="quick-actions mt-4">
+    <a href="mailto:{{ user.email }}">📩 Email Yourself</a>
+    <a href="#" onclick="window.print()">🖨️ Print Settings</a>
+    <a href="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.build_absolute_uri }}" target="_blank">🔗 Share QR</a>
+    <a href="#" onclick="confirmDelete()" style="color: #ff7675;">🗑️ Delete Account</a>
+  </div>
+
+  <!-- Security Tips -->
+  <div class="security-tip mt-4">
+    🔒 <strong>Security Tip:</strong> Use strong passwords & enable two-factor authentication (2FA) where available.
+  </div>
+
+  <!-- Real-time Clock -->
+  <div class="clock-box" id="clockBox" role="status">🕒 <span id="clock">Loading time...</span></div>
+</div>
+
+<!-- Theme Toggle -->
+<div class="mode-toggle" id="modeToggle" title="Toggle Theme" aria-label="Toggle Dark/Light Mode">🌙</div>
+
+<script>
+  function copyEmail() {
+    const email = document.getElementById("emailText").textContent;
+    navigator.clipboard.writeText(email);
+    alert("📋 Email copied to clipboard!");
+  }
+
+  function updateClock() {
+    const now = new Date();
+    document.getElementById("clock").textContent = now.toLocaleTimeString();
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  function confirmDelete() {
+    if (confirm("⚠️ Are you sure you want to delete your account? This action cannot be undone.")) {
+      alert("Redirecting to delete request...");
+      // window.location.href = "{% url 'users:delete_account' %}";
+    }
+  }
+
+  // Theme toggle (remembered)
+  const modeBtn = document.getElementById('modeToggle');
+  const theme = localStorage.getItem("theme") || "dark";
+  document.body.classList.toggle('light', theme === 'light');
+  modeBtn.textContent = theme === 'light' ? "🌙" : "☀️";
+
+  modeBtn.onclick = () => {
+    document.body.classList.toggle('light');
+    const newTheme = document.body.classList.contains('light') ? 'light' : 'dark';
+    localStorage.setItem("theme", newTheme);
+    modeBtn.textContent = newTheme === 'light' ? "🌙" : "☀️";
+  };
+</script>
+{% endblock %}
